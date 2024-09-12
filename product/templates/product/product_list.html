@@ -1,0 +1,122 @@
+{% extends 'base/base.html' %}
+
+{% block title %}
+  Dashboard
+{% endblock %}
+
+{% block content %}
+  <div class="container-fluid">
+    {% if form.errors %}
+      <div class="alert alert-danger" role="alert">
+        <i class="fas fa-exclamation-triangle"></i>
+      Verifique o formulario existe campos invalidos.  <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#add"><strong>"Click para corrigur"</strong></button>
+      </div>
+    {% endif %}
+    {% include "partials/message.html" %}
+    <div class="card">
+      
+      <div class="card-header">
+        <div class="col-sm-12 col-md-6 card-title">
+          <div class="dt-buttons btn-group flex-wrap">
+            <button class="btn btn-secondary buttons-copy buttons-html5" tabindex="0" aria-controls="example1" type="button"><span>Copy</span></button>
+            <button class="btn btn-secondary buttons-csv buttons-html5" tabindex="0" aria-controls="example1" type="button"><span>CSV</span></button>
+            <button class="btn btn-secondary buttons-excel buttons-html5" tabindex="0" aria-controls="example1" type="button"><span>Excel</span></button>
+            <button class="btn btn-secondary buttons-pdf buttons-html5" tabindex="0" aria-controls="example1" type="button"><span>PDF</span></button>
+            <button class="btn btn-secondary buttons-print" tabindex="0" aria-controls="example1" type="button"><span>Print</span></button>
+
+            <div class="col-sm-12 col-md-3">
+              <button type="button" class="btn btn-info" data-toggle="modal" data-target="#add">Adicionar</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-tools">
+          <div class="input-group input-group-sm" style="width: 150px;">
+            <input type="text" name="table_search" class="form-control float-right" placeholder="Search" />
+
+            <div class="input-group-append">
+              <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body table-responsive p-0" style="height: 80dvh;">
+      <table id="example2" class="table table-head-fixed text-nowrap table-bordered table-hover dataTable dtr-inline" aria-describedby="example2_info">
+        <thead>
+          <tr>
+            <th class="sorting sorting_asc" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Rendering engine: activate to sort column descending">Nome</th>
+            <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Browser: activate to sort column ascending">Marca</th>
+            <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Platform(s): activate to sort column ascending">Categoria</th>
+            <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Engine version: activate to sort column ascending">Preço de Custo</th>
+            <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="CSS grade: activate to sort column ascending">Preco</th>
+            <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="CSS grade: activate to sort column ascending">Ativo</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for product in products %}
+            <tr class="odd">
+              <td class="dtr-control sorting_1" tabindex="0">{{ product.title }}</td>
+              <td>{{ product.brand }}</td>
+              <td>{{ product.category }}</td>
+              <td>{{ product.cost_price }}</td>
+              <td>{{ product.price }}</td>
+              <td><input type="checkbox" class="bg-success" name="active" id="active" checked='{{ product.is_active }}' disabled></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <th rowspan="1" colspan="1">Nome</th>
+            <th rowspan="1" colspan="1">Marca</th>
+            <th rowspan="1" colspan="1">Categoria(s)</th>
+            <th rowspan="1" colspan="1">Preço de Custo</th>
+            <th rowspan="1" colspan="1">Preco</th>
+            <th rowspan="1" colspan="1">Ativo</th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <div class="modal fade" id="add" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Adicionar</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+        </div>
+        <div class="modal-body">
+          <h4 class="text-secondary">Criar uma Produto</h4>
+          <form method="POST" action="{% url "product:valid" %}" class="text-secondary">
+            {% csrf_token %}
+            <div class="row">
+              {% for field in form %}
+              
+                <div class="form-group col-sm-12 col-xl-6 col-md-6 col-xl-6">
+                  <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                  {{ field }}
+                  
+                  {% if field.help_text %}
+                    <p class="text-secondary">{{ field.help_text }}</p>
+                  {% endif %}
+                  <div class="text-danger">
+                    {{ field.errors }}
+                  </div>
+                </div>
+
+              {% endfor %}
+            </div>
+
+            <button class="btn btn-info mt-3" type="submit">Gravar</button>
+          </form>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+{% endblock %}

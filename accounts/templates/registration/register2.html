@@ -1,0 +1,14 @@
+{% extends 'templates_base/base.html' %}
+
+{% block title %}Registrar{% endblock %}
+
+{% block content %} 
+<div class="col-md-4">
+    <h4 class="text-white">Criar uma conta</h4>
+    <form method="post" class="text-white">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="btn btn-warning mt-3" type="submit">Registrar</button>
+    </form>
+</div>
+{% endblock %}

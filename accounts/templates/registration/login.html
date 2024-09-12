@@ -1,0 +1,39 @@
+{% extends 'templates_base/base.html' %}
+
+{% block title %}
+  Login
+{% endblock %}
+{% load static %}
+{% block content %}
+  <div class="row">
+    <div class="col-md-4 login container">
+      <div class="form-login ">
+        <img class="logo_login" src="{% static 'dist/img/OptiManageLogo.png' %}" alt="OptiManage Logo" style="opacity: .8" />
+        <form method="post">
+          {% csrf_token %}
+
+          <div class="mb-3">
+            <label class="form-label" for="id_username">Usuário:</label>
+            <input type="text" name="username" class="form-control" />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label" for="id_password">Senha:</label>
+            <input type="password" name="password" class="form-control" />
+          </div>
+
+          <button class="btn btn-primary" type="submit">Entrar</button>
+        </form>
+
+        <a href="{% url 'password_reset' %}">Esqueci minha senha</a>
+      </div>
+    </div>
+
+    <div class="col-md-8 col-lg-8 col-xl-8 col-8 d-sm-none d-md-block d-lg-block d-xl-block">
+        <div class="logo_login_page ">
+            <img class="img-logo-page " src="{% static 'dist/img/OptiManageLogotipo.png' %}" alt="OptiManage Logo" style="opacity: .8" />
+        </div>
+      
+    </div>
+  </div>
+{% endblock %}

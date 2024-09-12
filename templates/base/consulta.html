@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Verificar Novos Dados</title>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/alpine.min.js" defer></script>
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('verificacaoDados', () => ({
+                dados: [],
+                init() {
+                    this.fetchDados();
+                    setInterval(() => this.fetchDados(), 10000); // Verifica a cada 10 segundos
+                },
+                async fetchDados() {
+                    try {
+                        const response = await fetch("{% url 'verificar_novos_dados' %}");
+                        if (response.ok) {
+                            this.dados = await response.json();
+                        } else {
+                            console.error("Erro na requisição:", response.statusText);
+                        }
+                    } catch (error) {
+                        console.error("Erro na requisição AJAX:", error);
+                    }
+                }
+            }));
+        });
+    </script>
+</head>
+<body>
+    <div x-data="verificacaoDados">
+        <h1>Verifique Novos Dados</h1>
+        <div id="dados-container">
+            <template x-for="item in dados" :key="item.id">
+                <p x-text="item.campo_relevante"></p> <!-- Substitua 'campo_relevante' conforme necessário -->
+            </template>
+        </div>
+    </div>
+</body>
+</html>
