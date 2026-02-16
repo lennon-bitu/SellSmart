@@ -1,4 +1,4 @@
-# SellSmartAI
+# SellSmart
 
 Sistema de gestão comercial desenvolvido com **Django 5.0**, focado em PDV (Ponto de Venda), controle financeiro e gestão de produtos.
 
@@ -33,7 +33,7 @@ Sistema de gestão comercial desenvolvido com **Django 5.0**, focado em PDV (Pon
 1. **Clone o repositório**
    ```bash
    git clone https://github.com/lennon-bitu/SellSmart.git
-   cd SellSmartAI
+   cd SellSmart
    ```
 
 2. **Crie um ambiente virtual**
@@ -112,7 +112,7 @@ pytest --cov=.
 ## 📁 Estrutura do Projeto
 
 ```
-SellSmartAI/
+SellSmart/
 ├── accounts/           # Autenticação e gestão de usuários
 ├── core/               # Configurações principais do Django
 ├── dashboard/          # Painel de indicadores
