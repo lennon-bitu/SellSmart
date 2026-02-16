@@ -1,0 +1,58 @@
+{% extends 'base/base.html' %}
+
+{% block title %}
+  {{ action }}
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">{{ action }}</h3>
+        </div>
+        <div class="card-body">
+          <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+              <label for="{{ form.origin_cash_book.id_for_label }}">Livro Caixa de Origem:</label>
+              {{ form.origin_cash_book }}
+              <div class="text-danger">
+                {{ form.origin_cash_book.errors }}
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="{{ form.destination_cash_book.id_for_label }}">Livro Caixa de Destino:</label>
+              {{ form.destination_cash_book }}
+              <div class="text-danger">
+                {{ form.destination_cash_book.errors }}
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="{{ form.amount.id_for_label }}">Valor:</label>
+              {{ form.amount }}
+              <div class="text-danger">
+                {{ form.amount.errors }}
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="{{ form.description.id_for_label }}">Descrição:</label>
+              {{ form.description }}
+              <div class="text-danger">
+                {{ form.description.errors }}
+              </div>
+            </div>
+            
+            <button type="submit" class="btn btn-success">Realizar Transferência</button>
+            <a href="{% url 'financial_control:financial_control' %}" class="btn btn-secondary">Cancelar</a>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

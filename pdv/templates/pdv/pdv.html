@@ -1,0 +1,326 @@
+{% extends 'base/base.html' %}
+
+{% block title %}
+  Ponto de Venda (PDV)
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Ponto de Venda (PDV)</h3>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="searchProduct">Buscar Produto:</label>
+                <div class="input-group">
+                  <input type="text" class="form-control" id="searchProduct" placeholder="Digite o nome do produto...">
+                  <div class="input-group-append">
+                    <button class="btn btn-primary" type="button" id="searchBtn">Buscar</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>Operações de Caixa:</label>
+                <div class="btn-group w-100">
+                  <button class="btn btn-success" type="button" onclick="openCashRegister()">Abrir Caixa</button>
+                  <button class="btn btn-warning" type="button" onclick="cashOut()">Sangria</button>
+                  <button class="btn btn-info" type="button" onclick="cashIn()">Suprimento</button>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="customerSelect">Cliente (Opcional):</label>
+                <select class="form-control" id="customerSelect">
+                  <option value="">Nenhum cliente</option>
+                  <!-- Opções serão carregadas dinamicamente -->
+                </select>
+              </div>
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-12">
+              <h4>Resultados da Busca:</h4>
+              <div id="searchResults" class="list-group">
+                <!-- Resultados da busca serão exibidos aqui -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Carrinho de Compras</h3>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-sm">
+              <thead>
+                <tr>
+                  <th>Produto</th>
+                  <th>Qtd</th>
+                  <th>Preço</th>
+                  <th>Total</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="cartItems">
+                <!-- Itens do carrinho serão exibidos aqui -->
+              </tbody>
+            </table>
+          </div>
+          
+          <div class="mt-3">
+            <div class="d-flex justify-content-between">
+              <strong>Total:</strong>
+              <span id="cartTotal">R$ 0,00</span>
+            </div>
+            
+            <div class="form-group mt-2">
+              <label for="discountInput">Desconto:</label>
+              <input type="number" class="form-control" id="discountInput" value="0.00" step="0.01" min="0">
+            </div>
+            
+            <div class="form-group">
+              <label for="paymentMethod">Método de Pagamento:</label>
+              <select class="form-control" id="paymentMethod">
+                <option value="dinheiro">Dinheiro</option>
+                <option value="cartao_credito">Cartão de Crédito</option>
+                <option value="cartao_debito">Cartão de Débito</option>
+                <option value="pix">PIX</option>
+                <option value="boleto">Boleto</option>
+              </select>
+            </div>
+            
+            <button class="btn btn-success btn-block mt-2" id="finalizeSaleBtn">Finalizar Venda</button>
+            <button class="btn btn-secondary btn-block mt-1" id="cancelSaleBtn">Cancelar Venda</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Variáveis globais para o carrinho
+  let cart = [];
+
+  // Função para abrir caixa
+  function openCashRegister() {
+    // Redirecionar para a página de abertura de caixa
+    window.location.href = '{% url 'financial_control:open_cash_register' %}';
+  }
+
+  // Função para sangria de caixa
+  function cashOut() {
+    // Redirecionar para a página de sangria
+    window.location.href = '{% url 'financial_control:cash_out' %}';
+  }
+
+  // Função para suprimento de caixa
+  function cashIn() {
+    // Redirecionar para a página de suprimento
+    window.location.href = '{% url 'financial_control:cash_in' %}';
+  }
+  
+  // Função para buscar produtos
+  function searchProducts(query) {
+    if (!query.trim()) {
+      document.getElementById('searchResults').innerHTML = '';
+      return;
+    }
+    
+    fetch(`/pdv/search-product/?q=${encodeURIComponent(query)}`)
+      .then(response => response.json())
+      .then(products => {
+        const resultsDiv = document.getElementById('searchResults');
+        resultsDiv.innerHTML = '';
+        
+        if (products.length === 0) {
+          resultsDiv.innerHTML = '<div class="list-group-item">Nenhum produto encontrado</div>';
+          return;
+        }
+        
+        products.forEach(product => {
+          const item = document.createElement('div');
+          item.className = 'list-group-item';
+          item.innerHTML = `
+            <div class="d-flex justify-content-between">
+              <div>
+                <h6>${product.name}</h6>
+                <small class="text-muted">Preço: R$ ${parseFloat(product.price).toFixed(2)}</small>
+                <br>
+                <small class="text-muted">Estoque: ${product.stock || 'N/A'}</small>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="addToCart(${product.id}, '${product.name}', ${product.price})">Adicionar</button>
+            </div>
+          `;
+          resultsDiv.appendChild(item);
+        });
+      })
+      .catch(error => {
+        console.error('Erro ao buscar produtos:', error);
+        document.getElementById('searchResults').innerHTML = '<div class="list-group-item text-danger">Erro ao buscar produtos</div>';
+      });
+  }
+  
+  // Função para adicionar produto ao carrinho
+  function addToCart(productId, productName, price) {
+    // Verificar se o produto já está no carrinho
+    const existingItem = cart.find(item => item.productId === productId);
+    
+    if (existingItem) {
+      existingItem.quantity++;
+    } else {
+      cart.push({
+        productId: productId,
+        name: productName,
+        price: price,
+        quantity: 1
+      });
+    }
+    
+    updateCartDisplay();
+    
+    // Limpar campo de busca após adicionar produto
+    document.getElementById('searchProduct').value = '';
+    document.getElementById('searchResults').innerHTML = '';
+  }
+  
+  // Função para remover item do carrinho
+  function removeFromCart(index) {
+    cart.splice(index, 1);
+    updateCartDisplay();
+  }
+  
+  // Função para atualizar a exibição do carrinho
+  function updateCartDisplay() {
+    const cartItems = document.getElementById('cartItems');
+    cartItems.innerHTML = '';
+    
+    let total = 0;
+    
+    cart.forEach((item, index) => {
+      const itemTotal = item.price * item.quantity;
+      total += itemTotal;
+      
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${item.name}</td>
+        <td>
+          <input type="number" class="form-control form-control-sm" value="${item.quantity}" min="1" onchange="updateQuantity(${index}, this.value)" style="width: 70px; display: inline;">
+        </td>
+        <td>R$ ${item.price.toFixed(2)}</td>
+        <td>R$ ${itemTotal.toFixed(2)}</td>
+        <td>
+          <button class="btn btn-danger btn-sm" onclick="removeFromCart(${index})">
+            <i class="fas fa-trash"></i>
+          </button>
+        </td>
+      `;
+      cartItems.appendChild(row);
+    });
+    
+    // Atualizar total
+    document.getElementById('cartTotal').textContent = `R$ ${total.toFixed(2)}`;
+  }
+  
+  // Função para atualizar quantidade
+  function updateQuantity(index, newQuantity) {
+    newQuantity = parseInt(newQuantity);
+    if (newQuantity < 1) newQuantity = 1;
+    
+    cart[index].quantity = newQuantity;
+    updateCartDisplay();
+  }
+  
+  // Função para finalizar venda
+  function finalizeSale() {
+    if (cart.length === 0) {
+      alert('O carrinho está vazio!');
+      return;
+    }
+    
+    const customerId = document.getElementById('customerSelect').value || null;
+    const discount = parseFloat(document.getElementById('discountInput').value) || 0;
+    const paymentMethod = document.getElementById('paymentMethod').value;
+    
+    // Enviar dados para o servidor
+    fetch('/pdv/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+      },
+      body: JSON.stringify({
+        items: cart.map(item => ({
+          product_id: item.productId,
+          quantity: item.quantity
+        })),
+        customer_id: customerId,
+        discount: discount,
+        payment_method: paymentMethod
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert(data.message);
+        // Limpar carrinho
+        cart = [];
+        updateCartDisplay();
+        document.getElementById('searchProduct').value = '';
+        document.getElementById('searchResults').innerHTML = '';
+        document.getElementById('discountInput').value = '0.00';
+      } else {
+        alert('Erro: ' + data.message);
+      }
+    })
+    .catch(error => {
+      console.error('Erro ao finalizar venda:', error);
+      alert('Erro ao finalizar venda. Verifique o console para mais detalhes.');
+    });
+  }
+  
+  // Função para cancelar venda
+  function cancelSale() {
+    if (confirm('Tem certeza que deseja cancelar esta venda?')) {
+      cart = [];
+      updateCartDisplay();
+      document.getElementById('searchProduct').value = '';
+      document.getElementById('searchResults').innerHTML = '';
+      document.getElementById('discountInput').value = '0.00';
+    }
+  }
+  
+  // Event listeners
+  document.getElementById('searchBtn').addEventListener('click', function() {
+    const query = document.getElementById('searchProduct').value;
+    searchProducts(query);
+  });
+  
+  document.getElementById('searchProduct').addEventListener('keyup', function(event) {
+    if (event.key === 'Enter') {
+      const query = document.getElementById('searchProduct').value;
+      searchProducts(query);
+    }
+  });
+  
+  document.getElementById('finalizeSaleBtn').addEventListener('click', finalizeSale);
+  document.getElementById('cancelSaleBtn').addEventListener('click', cancelSale);
+  
+  // Carregar clientes (simulação - em produção, você teria uma API para isso)
+  // Por enquanto, vamos deixar a lista vazia ou adicionar manualmente
+</script>
+{% endblock %}

@@ -1,0 +1,127 @@
+{% extends 'base/base.html' %}
+
+{% block title %}
+  Contas a Pagar
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Contas a Pagar</h3>
+          <div class="card-tools">
+            <a href="{% url 'financial_control:create_account_payable' %}" class="btn btn-primary">Nova Conta</a>
+          </div>
+        </div>
+        <div class="card-body">
+          <!-- Filtros -->
+          <div class="row mb-3">
+            <div class="col-md-12">
+              <form method="get" class="form-inline">
+                <div class="form-group mb-2 mr-2">
+                  <label for="is_paid" class="mr-2">Status:</label>
+                  <select class="form-control" name="is_paid">
+                    <option value="">Todos</option>
+                    <option value="false" {% if request.GET.is_paid == 'false' %}selected{% endif %}>Pendentes</option>
+                    <option value="true" {% if request.GET.is_paid == 'true' %}selected{% endif %}>Pagos</option>
+                  </select>
+                </div>
+                <div class="form-group mb-2 mr-2">
+                  <label for="start_date" class="mr-2">Data Início:</label>
+                  <input type="date" class="form-control" name="start_date" value="{{ request.GET.start_date }}">
+                </div>
+                <div class="form-group mb-2 mr-2">
+                  <label for="end_date" class="mr-2">Data Fim:</label>
+                  <input type="date" class="form-control" name="end_date" value="{{ request.GET.end_date }}">
+                </div>
+                <button type="submit" class="btn btn-primary mb-2">Filtrar</button>
+              </form>
+            </div>
+          </div>
+          
+          <!-- Tabela de contas -->
+          <div class="table-responsive">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>Fornecedor</th>
+                  <th>Valor</th>
+                  <th>Vencimento</th>
+                  <th>Emissão</th>
+                  <th>Status</th>
+                  <th>Descrição</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for account in page_obj %}
+                <tr>
+                  <td>{{ account.supplier }}</td>
+                  <td>R$ {{ account.amount }}</td>
+                  <td>{{ account.due_date|date:"d/m/Y" }}</td>
+                  <td>{{ account.issue_date|date:"d/m/Y" }}</td>
+                  <td>
+                    {% if account.is_paid %}
+                      <span class="badge badge-success">Pago</span>
+                    {% else %}
+                      <span class="badge badge-warning">Pendente</span>
+                    {% endif %}
+                  </td>
+                  <td>{{ account.description }}</td>
+                  <td>
+                    {% if not account.is_paid %}
+                      <a href="{% url 'financial_control:mark_as_paid_payable_with_cash_book' account.id %}" class="btn btn-sm btn-success">Marcar como Pago</a>
+                    {% else %}
+                      <a href="#" class="btn btn-sm btn-secondary" disabled>Pago</a>
+                    {% endif %}
+                    <a href="{% url 'financial_control:edit_account_payable' account.id %}" class="btn btn-sm btn-warning">Editar</a>
+                    <a href="{% url 'financial_control:delete_account_payable' account.id %}" class="btn btn-sm btn-danger">Excluir</a>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="7">Nenhuma conta a pagar encontrada</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- Paginação -->
+          {% if page_obj.has_other_pages %}
+          <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center">
+              {% if page_obj.has_previous %}
+                <li class="page-item">
+                  <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page=1">&laquo; Primeira</a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}">Anterior</a>
+                </li>
+              {% endif %}
+              
+              <li class="page-item active">
+                <span class="page-link">
+                  Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                </span>
+              </li>
+              
+              {% if page_obj.has_next %}
+                <li class="page-item">
+                  <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}">Próxima</a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.paginator.num_pages }}">Última &raquo;</a>
+                </li>
+              {% endif %}
+            </ul>
+          </nav>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

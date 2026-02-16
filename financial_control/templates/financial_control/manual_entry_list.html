@@ -1,0 +1,140 @@
+{% extends 'base/base.html' %}
+
+{% block title %}
+  Lançamentos Manuais
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Lançamentos Manuais</h3>
+          <div class="card-tools">
+            <a href="{% url 'financial_control:manual_entry' %}" class="btn btn-primary">Novo Lançamento</a>
+          </div>
+        </div>
+        <div class="card-body">
+          <!-- Filtros -->
+          <div class="row mb-3">
+            <div class="col-md-12">
+              <form method="get" class="form-inline">
+                <div class="form-group mb-2 mr-2">
+                  <label for="cash_book" class="mr-2">Livro Caixa:</label>
+                  <select class="form-control" name="cash_book" id="cash_book">
+                    <option value="">Todos</option>
+                    {% for book in cash_books %}
+                      <option value="{{ book.id }}" {% if current_filters.cash_book_filter == book.id|stringformat:"s" %}selected{% endif %}>
+                        {{ book.name }}
+                      </option>
+                    {% endfor %}
+                  </select>
+                </div>
+                
+                <div class="form-group mb-2 mr-2">
+                  <label for="transaction_type" class="mr-2">Tipo:</label>
+                  <select class="form-control" name="transaction_type" id="transaction_type">
+                    <option value="">Todos</option>
+                    {% for type, label in transaction_types %}
+                      <option value="{{ type }}" {% if current_filters.transaction_type_filter == type %}selected{% endif %}>
+                        {{ label }}
+                      </option>
+                    {% endfor %}
+                  </select>
+                </div>
+                
+                <div class="form-group mb-2 mr-2">
+                  <label for="start_date" class="mr-2">Data Início:</label>
+                  <input type="date" class="form-control" name="start_date" id="start_date" value="{{ current_filters.start_date|date:'Y-m-d' }}">
+                </div>
+                
+                <div class="form-group mb-2 mr-2">
+                  <label for="end_date" class="mr-2">Data Fim:</label>
+                  <input type="date" class="form-control" name="end_date" id="end_date" value="{{ current_filters.end_date|date:'Y-m-d' }}">
+                </div>
+                
+                <button type="submit" class="btn btn-primary mb-2">Filtrar</button>
+              </form>
+            </div>
+          </div>
+          
+          <!-- Tabela de lançamentos -->
+          <div class="table-responsive">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Tipo</th>
+                  <th>Método</th>
+                  <th>Valor</th>
+                  <th>Livro Caixa</th>
+                  <th>Descrição</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for entry in page_obj %}
+                <tr>
+                  <td>{{ entry.date|date:"d/m/Y H:i" }}</td>
+                  <td>{{ entry.get_transaction_type_display }}</td>
+                  <td>{{ entry.get_payment_method_display }}</td>
+                  <td>
+                    {% if entry.amount > 0 %}
+                      <span class="text-success">R$ {{ entry.amount|floatformat:2 }}</span>
+                    {% else %}
+                      <span class="text-danger">R$ {{ entry.amount|floatformat:2|cut:"-" }}</span>
+                    {% endif %}
+                  </td>
+                  <td>{{ entry.cash_book.name|default:"-" }}</td>
+                  <td>{{ entry.description }}</td>
+                  <td>
+                    <a href="{% url 'financial_control:reverse_transaction' entry.id %}" class="btn btn-sm btn-warning">Estornar</a>
+                    <a href="#" class="btn btn-sm btn-danger">Excluir</a>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="7">Nenhum lançamento encontrado</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- Paginação -->
+          {% if page_obj.has_other_pages %}
+          <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center">
+              {% if page_obj.has_previous %}
+                <li class="page-item">
+                  <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page=1">&laquo; Primeira</a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}">Anterior</a>
+                </li>
+              {% endif %}
+              
+              <li class="page-item active">
+                <span class="page-link">
+                  Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                </span>
+              </li>
+              
+              {% if page_obj.has_next %}
+                <li class="page-item">
+                  <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}">Próxima</a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.paginator.num_pages }}">Última &raquo;</a>
+                </li>
+              {% endif %}
+            </ul>
+          </nav>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

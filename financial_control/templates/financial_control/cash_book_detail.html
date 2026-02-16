@@ -1,0 +1,129 @@
+{% extends 'base/base.html' %}
+{% load financial_extras %}
+
+{% block title %}
+  {{ cash_book.name }}
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Livro Caixa: {{ cash_book.name }}</h3>
+          <div class="card-tools">
+            <a href="{% url 'financial_control:manual_entry' %}?cash_book={{ cash_book.id }}" class="btn btn-primary">Novo Lançamento</a>
+          </div>
+        </div>
+        <div class="card-body">
+          <!-- Resumo de Valores -->
+          <div class="row">
+            <div class="col-md-4">
+              <div class="info-box">
+                <span class="info-box-icon bg-success"><i class="fas fa-arrow-down"></i></span>
+                <div class="info-box-content">
+                  <span class="info-box-text">Total Entradas</span>
+                  <span class="info-box-number">R$ {{ total_entries|floatformat:2 }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="info-box">
+                <span class="info-box-icon bg-danger"><i class="fas fa-arrow-up"></i></span>
+                <div class="info-box-content">
+                  <span class="info-box-text">Total Saídas</span>
+                  <span class="info-box-number">R$ {{ total_exits|floatformat:2 }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="info-box">
+                <span class="info-box-icon bg-info"><i class="fas fa-wallet"></i></span>
+                <div class="info-box-content">
+                  <span class="info-box-text">Saldo Atual</span>
+                  <span class="info-box-number">R$ {{ balance|floatformat:2 }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-12">
+              <div class="info-box">
+                <span class="info-box-icon bg-warning"><i class="fas fa-exchange-alt"></i></span>
+                <div class="info-box-content">
+                  <span class="info-box-text">Transações</span>
+                  <span class="info-box-number">{{ transactions|length }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Filtros -->
+          <div class="row mt-3">
+            <div class="col-md-12">
+              <form method="get" class="form-inline">
+                <div class="form-group mb-2">
+                  <label for="start_date" class="mr-2">Data Início:</label>
+                  <input type="date" class="form-control" name="start_date" value="{{ request.GET.start_date }}">
+                </div>
+                <div class="form-group mx-2 mb-2">
+                  <label for="end_date" class="mr-2">Data Fim:</label>
+                  <input type="date" class="form-control" name="end_date" value="{{ request.GET.end_date }}">
+                </div>
+                <button type="submit" class="btn btn-primary mb-2">Filtrar</button>
+              </form>
+            </div>
+          </div>
+          
+          <!-- Transações -->
+          <div class="row mt-4">
+            <div class="col-md-12">
+              <h4>Movimentações</h4>
+              <div class="table-responsive">
+                <table class="table table-bordered">
+                  <thead>
+                    <tr>
+                      <th>Data</th>
+                      <th>Tipo</th>
+                      <th>Método</th>
+                      <th>Descrição</th>
+                      <th>Entrada</th>
+                      <th>Saída</th>
+                      <th>Saldo</th>
+                      <th>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for transaction in transactions %}
+                    <tr>
+                      <td>{{ transaction.date|date:"d/m/Y H:i" }}</td>
+                      <td>{{ transaction.get_transaction_type_display }}</td>
+                      <td>{{ transaction.get_payment_method_display }}</td>
+                      <td>{{ transaction.description }}</td>
+                      <td>{% if transaction.amount > 0 %}R$ {{ transaction.amount|floatformat:2 }}{% endif %}</td>
+                      <td>{% if transaction.amount < 0 %}R$ {{ transaction.amount|floatformat:2|cut:"-" }}{% endif %}</td>
+                      <td>
+                        R$ {{ transaction.running_balance|floatformat:2 }}
+                      </td>
+                      <td>
+                        <a href="{% url 'financial_control:reverse_transaction' transaction.id %}" class="btn btn-sm btn-warning">Estornar</a>
+                      </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                      <td colspan="8">Nenhuma transação encontrada</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

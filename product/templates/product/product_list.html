@@ -1,7 +1,7 @@
 {% extends 'base/base.html' %}
 
 {% block title %}
-  Dashboard
+  Lista de Produto
 {% endblock %}
 
 {% block content %}
@@ -18,11 +18,10 @@
       <div class="card-header">
         <div class="col-sm-12 col-md-6 card-title">
           <div class="dt-buttons btn-group flex-wrap">
-            <button class="btn btn-secondary buttons-copy buttons-html5" tabindex="0" aria-controls="example1" type="button"><span>Copy</span></button>
-            <button class="btn btn-secondary buttons-csv buttons-html5" tabindex="0" aria-controls="example1" type="button"><span>CSV</span></button>
-            <button class="btn btn-secondary buttons-excel buttons-html5" tabindex="0" aria-controls="example1" type="button"><span>Excel</span></button>
-            <button class="btn btn-secondary buttons-pdf buttons-html5" tabindex="0" aria-controls="example1" type="button"><span>PDF</span></button>
-            <button class="btn btn-secondary buttons-print" tabindex="0" aria-controls="example1" type="button"><span>Print</span></button>
+            <button class="btn btn-secondary buttons-csv buttons-html5" tabindex="0" aria-controls="example1" type="button"> <a href="{% url 'product:csv' %}" class="text-white"><span>CSV</span></a></button>
+            <button class="btn btn-secondary buttons-excel buttons-html5" tabindex="0" aria-controls="example1" type="button"><a href="{% url 'product:excel' %}" class="text-white"><span>Excel</span></a></button>
+            <!--<button class="btn btn-secondary buttons-pdf buttons-html5" tabindex="0" aria-controls="example1" type="button"><a href="#" class="text-white"><span>PDF</span></a></button>-->
+            <button class="btn btn-secondary buttons-print" tabindex="0" aria-controls="example1" type="button"><a href="{% url 'product:print' %}" class="text-white"><span>Imprimir</span></a></button>
 
             <div class="col-sm-12 col-md-3">
               <button type="button" class="btn btn-info" data-toggle="modal" data-target="#add">Adicionar</button>
@@ -45,37 +44,86 @@
       <table id="example2" class="table table-head-fixed text-nowrap table-bordered table-hover dataTable dtr-inline" aria-describedby="example2_info">
         <thead>
           <tr>
-            <th class="sorting sorting_asc" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Rendering engine: activate to sort column descending">Nome</th>
+            <th class="sorting sorting_asc" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Rendering engine: activate to sort column descending">Código</th>
+            <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Browser: activate to sort column ascending">Nome</th>
             <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Browser: activate to sort column ascending">Marca</th>
             <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Platform(s): activate to sort column ascending">Categoria</th>
             <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Engine version: activate to sort column ascending">Preço de Custo</th>
-            <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="CSS grade: activate to sort column ascending">Preco</th>
+            <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="CSS grade: activate to sort column ascending">Preço</th>
             <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="CSS grade: activate to sort column ascending">Ativo</th>
+            <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="CSS grade: activate to sort column ascending">Ações</th>
           </tr>
         </thead>
         <tbody>
-          {% for product in products %}
+          {% for product in page_obj %}
             <tr class="odd">
-              <td class="dtr-control sorting_1" tabindex="0">{{ product.title }}</td>
+              <td class="dtr-control sorting_1" tabindex="0">{{ product.code }}</td>
+              <td class="dtr-control sorting_1" tabindex="0">{{ product.name }}</td>
               <td>{{ product.brand }}</td>
               <td>{{ product.category }}</td>
               <td>{{ product.cost_price }}</td>
               <td>{{ product.price }}</td>
-              <td><input type="checkbox" class="bg-success" name="active" id="active" checked='{{ product.is_active }}' disabled></td>
+              <td>
+                {% if product.is_active %}
+                  <span class="badge badge-success">Sim</span>
+                {% else %}
+                  <span class="badge badge-danger">Não</span>
+                {% endif %}
+              </td>
+              <td>
+                <div class="dt-buttons btn-group flex-wrap">
+                  <a class="btn btn-secondary buttons-copy buttons-html5" tabindex="0" aria-controls="example1" type="button" title="Visualizar" href="{% url "product:detail" product.id %}"><span><i class="fas fa-eye"></i></span></a>
+                  <a class="btn btn-warning buttons-csv buttons-html5" tabindex="0" aria-controls="example1" type="button" title="Editar" href="{% url "product:update" product.id %}"><span><i class="fas fa-pen" ></i></span></a>
+                  <a class="btn btn-danger buttons-excel buttons-html5" tabindex="0" aria-controls="example1" type="button" title="Excluir" href="{% url 'product:delete' product.id %}"><span><i class="fas fa-trash" ></i></span></a>
+                  <a class="btn btn-info buttons-pdf buttons-html5" tabindex="0" aria-controls="example1" type="button" title="Ajuste de Estoque"><span><i class="fas fa-boxes"></i></span></a>
+                </div>
+              </td>
             </tr>
           {% endfor %}
         </tbody>
         <tfoot>
           <tr>
+            <th rowspan="1" colspan="1">Código</th>
             <th rowspan="1" colspan="1">Nome</th>
             <th rowspan="1" colspan="1">Marca</th>
             <th rowspan="1" colspan="1">Categoria(s)</th>
             <th rowspan="1" colspan="1">Preço de Custo</th>
-            <th rowspan="1" colspan="1">Preco</th>
+            <th rowspan="1" colspan="1">Preço</th>
             <th rowspan="1" colspan="1">Ativo</th>
+            <th rowspan="1" colspan="1">Ações</th>
           </tr>
         </tfoot>
       </table>
+      <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center">
+          <li class="page-item">
+            {% if page_obj.has_previous %}
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                  <span aria-hidden="true">&laquo;</span>
+                  <span class="sr-only">Previous</span>
+                </a>
+            {% endif %}
+          </li>
+          <!-- Exibir números de páginas -->
+          {% for num in page_obj.paginator.page_range %}
+          {% if page_obj.number == num %}
+            <!-- Página atual -->
+              <li class="page-item current"><a class="page-link" href="#">{{ num }}</a></li>
+          {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+              <!-- Páginas próximas -->
+              <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+          {% endif %}
+      {% endfor %}
+          <li class="page-item">
+            {% if page_obj.has_next %}
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                  <span aria-hidden="true">&raquo;</span>
+                  <span class="sr-only">Next</span>
+                </a>
+            {% endif %}
+          </li>
+        </ul>
+      </nav>
     </div>
   </div>
 
@@ -88,15 +136,25 @@
         </div>
         <div class="modal-body">
           <h4 class="text-secondary">Criar uma Produto</h4>
-          <form method="POST" action="{% url "product:valid" %}" class="text-secondary">
+          <form method="POST" action="{% url 'product:valid' %}" class="text-secondary" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="row">
               {% for field in form %}
               
                 <div class="form-group col-sm-12 col-xl-6 col-md-6 col-xl-6">
                   <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                  {{ field }}
-                  
+                  {% if field.name == 'image' %}
+                    {{ field }}
+                    {% if field.value and field.value.url %}
+                      <div class="mt-2">
+                        <p>Imagem atual:</p>
+                        <img src="{{ field.value.url }}" alt="Imagem do produto" class="img-thumbnail" style="max-height: 150px;">
+                      </div>
+                    {% endif %}
+                  {% else %}
+                    {{ field }}
+                  {% endif %}
+
                   {% if field.help_text %}
                     <p class="text-secondary">{{ field.help_text }}</p>
                   {% endif %}

@@ -11,7 +11,7 @@ class BrandModelSerializer(serializers.ModelSerializer):
 class CategoryModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ['name', 'is_active', 'description', 'company', 'image',]
+        fields = ['name', 'is_active', 'description', 'image',]
 
         
 
@@ -19,4 +19,11 @@ class ProductModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         #fields = '__all__'
-        fields = ['name', 'brand', 'category', 'cost_price', 'price', 'stock', 'is_active', 'image',]
+        fields = ['id','name', 'brand', 'category', 'cost_price', 'price', 'stock', 'is_active', 'image',]
+
+    def update(self, instance, validated_data):
+        # Atualiza o status ou outros campos específicos
+        instance.stock = validated_data.get('stock', instance.stock)
+        instance.save()
+
+        return instance

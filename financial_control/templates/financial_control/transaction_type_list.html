@@ -1,0 +1,131 @@
+{% extends 'base/base.html' %}
+
+{% block title %}
+  Tipos de Transação
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Tipos de Transação</h3>
+          <div class="card-tools">
+            <a href="{% url 'financial_control:transaction_type_create' %}" class="btn btn-primary">Novo Tipo</a>
+          </div>
+        </div>
+        <div class="card-body">
+          <!-- Filtros -->
+          <div class="row mb-3">
+            <div class="col-md-12">
+              <form method="get" class="form-inline">
+                <div class="form-group mb-2 mr-2">
+                  <label for="type_category" class="mr-2">Categoria:</label>
+                  <select class="form-control" name="type_category" id="type_category">
+                    <option value="">Todas</option>
+                    <option value="entrada" {% if current_filters.type_category == 'entrada' %}selected{% endif %}>Entrada</option>
+                    <option value="saida" {% if current_filters.type_category == 'saida' %}selected{% endif %}>Saída</option>
+                    <option value="transferencia" {% if current_filters.type_category == 'transferencia' %}selected{% endif %}>Transferência</option>
+                  </select>
+                </div>
+                
+                <div class="form-group mb-2 mr-2">
+                  <label for="is_active" class="mr-2">Status:</label>
+                  <select class="form-control" name="is_active" id="is_active">
+                    <option value="">Todos</option>
+                    <option value="true" {% if current_filters.is_active == 'true' %}selected{% endif %}>Ativo</option>
+                    <option value="false" {% if current_filters.is_active == 'false' %}selected{% endif %}>Inativo</option>
+                  </select>
+                </div>
+                
+                <button type="submit" class="btn btn-primary mb-2">Filtrar</button>
+              </form>
+            </div>
+          </div>
+          
+          <!-- Tabela de tipos de transação -->
+          <div class="table-responsive">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>Descrição</th>
+                  <th>Categoria</th>
+                  <th>Status</th>
+                  <th>Criado Em</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for type in page_obj %}
+                <tr>
+                  <td>{{ type.name }}</td>
+                  <td>{{ type.description }}</td>
+                  <td>
+                    {% if type.type_category == 'entrada' %}
+                      <span class="badge badge-success">Entrada</span>
+                    {% elif type.type_category == 'saida' %}
+                      <span class="badge badge-danger">Saída</span>
+                    {% else %}
+                      <span class="badge badge-info">Transferência</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if type.is_active %}
+                      <span class="badge badge-success">Ativo</span>
+                    {% else %}
+                      <span class="badge badge-secondary">Inativo</span>
+                    {% endif %}
+                  </td>
+                  <td>{{ type.created_at|date:"d/m/Y" }}</td>
+                  <td>
+                    <a href="{% url 'financial_control:transaction_type_update' type.id %}" class="btn btn-sm btn-warning">Editar</a>
+                    <a href="{% url 'financial_control:transaction_type_delete' type.id %}" class="btn btn-sm btn-danger">Excluir</a>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="6">Nenhum tipo de transação encontrado</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- Paginação -->
+          {% if page_obj.has_other_pages %}
+          <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center">
+              {% if page_obj.has_previous %}
+                <li class="page-item">
+                  <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page=1">&laquo; Primeira</a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}">Anterior</a>
+                </li>
+              {% endif %}
+              
+              <li class="page-item active">
+                <span class="page-link">
+                  Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                </span>
+              </li>
+              
+              {% if page_obj.has_next %}
+                <li class="page-item">
+                  <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}">Próxima</a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.paginator.num_pages }}">Última &raquo;</a>
+                </li>
+              {% endif %}
+            </ul>
+          </nav>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

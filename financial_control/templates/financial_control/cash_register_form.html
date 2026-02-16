@@ -1,0 +1,42 @@
+{% extends 'base/base.html' %}
+
+{% block title %}
+  {{ action }}
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">{{ action }}</h3>
+        </div>
+        <div class="card-body">
+          <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+              <label for="{{ form.opening_balance.id_for_label }}">Saldo Inicial:</label>
+              {{ form.opening_balance }}
+              <div class="text-danger">
+                {{ form.opening_balance.errors }}
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="{{ form.responsible.id_for_label }}">Responsável:</label>
+              {{ form.responsible }}
+              <div class="text-danger">
+                {{ form.responsible.errors }}
+              </div>
+            </div>
+            
+            <button type="submit" class="btn btn-success">Abrir Caixa</button>
+            <a href="{% url 'financial_control:financial_control' %}" class="btn btn-secondary">Cancelar</a>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

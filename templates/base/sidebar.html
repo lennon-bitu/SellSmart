@@ -3,8 +3,8 @@
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
   <!-- Brand Logo -->
   <a href="index3.html" class="brand-link">
-    <img src="{% static 'dist/img/OptiManageLogo.png' %}" alt="OptiManage Logo" class="brand-image img-circle elevation-3" style="opacity: .8" />
-    <span class="brand-text font-weight-light">OptiManage</span>
+    <img src="{% static 'dist/img/SellSmartLogo.png' %}" alt="SellSmart Logo" class="brand-image img-circle elevation-3" style="opacity: .8" />
+    <span class="brand-text font-weight-light">Sell Smart</span>
   </a>
 
   <!-- Sidebar -->
@@ -58,7 +58,7 @@
           </ul>
         </li>
         <li class="nav-item">
-          <a href="pages/widgets.html" class="nav-link">
+          <a href="{% url 'pdv:pdv' %}" class="nav-link">
             <i class="nav-icon fas fa-cart-plus"></i>
             <p>
               PDV
@@ -76,19 +76,43 @@
           </a>
           <ul class="nav nav-treeview">
             <li class="nav-item">
-              <a href=" #" class="nav-link">
+              <a href="{% url 'product:category_list' %}" class="nav-link">
                 <i class="far fa-circle nav-icon"></i>
                 <p>Categoria</p>
               </a>
             </li>
             <li class="nav-item">
-              <a href=" #" class="nav-link">
+              <a href="{% url 'product:brand_list' %}" class="nav-link">
                 <i class="far fa-circle nav-icon"></i>
                 <p>Marca</p>
               </a>
             </li>
             <li class="nav-item">
-              <a href=" #" class="nav-link">
+              <a href="{% url 'product:ncm_list' %}" class="nav-link">
+                <i class="far fa-circle nav-icon"></i>
+                <p>NCM</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'product:cfop_list' %}" class="nav-link">
+                <i class="far fa-circle nav-icon"></i>
+                <p>CFOP</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'product:taxbenefit_list' %}" class="nav-link">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Benefício Fiscal</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'product:exemptionreason_list' %}" class="nav-link">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Motivo Desoneração</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'product:list' %}" class="nav-link">
                 <i class="far fa-circle nav-icon"></i>
                 <p>Produto</p>
               </a>
@@ -112,8 +136,8 @@
           </a>
           <ul class="nav nav-treeview">
             <li class="nav-item">
-              <a href="#" class="nav-link">
-                <i class="far fa-circle nav-icon"></i>
+              <a href="{% url 'orders:order_list' %}" class="nav-link">
+                <i class="fas fa-clipboard nav-icon"></i>
                 <p>Gerenciar Pedidos</p>
               </a>
             </li>
@@ -163,10 +187,11 @@
             </p>
           </a>
           <ul class="nav nav-treeview">
+            <li class="nav-header"><i class="fas fa-box nav-icon"></i> Produtos</li>
             <li class="nav-item">
               <a href="pages/forms/general.html" class="nav-link">
                 <i class="far fa-circle nav-icon"></i>
-                <p>Vendas por Meio de Pagamento</p>
+                <p>Vendas Meio de Pag.</p>
               </a>
             </li>
             <li class="nav-item">
@@ -185,6 +210,72 @@
               <a href="pages/forms/general.html" class="nav-link">
                 <i class="far fa-circle nav-icon"></i>
                 <p>Vendas Por cliente</p>
+              </a>
+            </li>
+            <li class="nav-header"><i class="fas fa-boxes nav-icon"></i>Estoque</li>
+            <li class="nav-item">
+              <a href="pages/forms/general.html" class="nav-link">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Movimento de Estoque</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="pages/forms/general.html" class="nav-link">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Posição de Estoque</p>
+              </a>
+            </li>
+          </ul>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="nav-link">
+            <i class="nav-icon fas fa-wallet"></i>
+            <p>
+              Controle Financeiro
+              <i class="right fas fa-angle-left"></i>
+            </p>
+          </a>
+          <ul class="nav nav-treeview">
+            <li class="nav-item">
+              <a href="{% url 'financial_control:financial_control' %}" class="nav-link">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Visão Geral</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'financial_control:cash_book_list' %}" class="nav-link">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Livros Caixa</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'financial_control:account_receivable_list' %}" class="nav-link">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Contas a Receber</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'financial_control:account_payable_list' %}" class="nav-link">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Contas a Pagar</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'financial_control:transfer' %}" class="nav-link">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Transferências</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'financial_control:manual_entry' %}" class="nav-link">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Novo Lançamento</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'financial_control:manual_entry_list' %}" class="nav-link">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Lista de Lançamentos</p>
               </a>
             </li>
           </ul>

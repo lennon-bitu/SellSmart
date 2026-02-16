@@ -1,0 +1,79 @@
+{% extends 'base-report/base.html' %}
+{% block title %}
+  Relatório de Produtos para Impressão
+{% endblock %}
+
+{% block headstyle %}
+
+{% endblock %}
+<style>
+  @media print {
+    body {
+      font-family: Arial, sans-serif;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th,
+    td {
+      border: 1px solid black;
+      padding: 8px;
+      text-align: left;
+    }
+    .no-print {
+        display: none; /* Hide the print button when printing */
+    }
+  }
+</style>
+
+{% block content %}
+<div class="container-fluid">
+    {% if form.errors %}
+      <div class="alert alert-danger" role="alert">
+        <i class="fas fa-exclamation-triangle"></i>
+      Verifique o formulario existe campos invalidos.  <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#add"><strong>"Click para corrigur"</strong></button>
+      </div>
+    {% endif %}
+    {% include "partials/message.html" %}
+    <div class="card">
+        <h2 class="text-center">Relatório de Produtos</h2> <button class="btn btn-warning ml-3 no-print" onclick="window.print()">Imprimir</button>
+    </div>
+    <div class="card-body table-responsive p-0" style="height: 80dvh;">
+      <table id="example2" class="table table-head-fixed text-nowrap table-bordered table-hover dataTable dtr-inline" aria-describedby="example2_info">
+        <thead>
+          <tr>
+            <th class="sorting sorting_asc" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Rendering engine: activate to sort column descending">Código</th>
+            <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Browser: activate to sort column ascending">Nome</th>
+            <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Browser: activate to sort column ascending">Marca</th>
+            <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Platform(s): activate to sort column ascending">Categoria</th>
+            <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Engine version: activate to sort column ascending">Preço de Custo</th>
+            <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="CSS grade: activate to sort column ascending">Preço</th>
+            <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="CSS grade: activate to sort column ascending">Ativo</th>
+          </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
+                <tr class="odd">
+                    <td class="dtr-control sorting_1" tabindex="0">{{ product.code }}</td>
+                    <td class="dtr-control sorting_1" tabindex="0">{{ product.name }}</td>
+                    <td>{{ product.brand }}</td>
+                    <td>{{ product.category }}</td>
+                    <td>{{ product.cost_price }}</td>
+                    <td>{{ product.price }}</td>
+                    <td>
+                      {% if product.is_active %}
+                        <span class="badge badge-success">Sim</span>
+                      {% else %}
+                        <span class="badge badge-danger">Não</span>
+                      {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  </div>
+{% endblock %}

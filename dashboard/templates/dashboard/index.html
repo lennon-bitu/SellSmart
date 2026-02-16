@@ -1,0 +1,292 @@
+{% extends 'base/base.html' %}
+
+{% block title %}
+  Dashboard
+{% endblock %}
+
+{% block content %}
+  <!-- Content Header (Page header) -->
+  <div class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1 class="m-0">Dashboard</h1>
+        </div>
+        <!-- /.col -->
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item">
+              <a href="#">Home</a>
+            </li>
+            <li class="breadcrumb-item active">Dashboard v1</li>
+          </ol>
+        </div>
+        <!-- /.col -->
+      </div>
+      <!-- /.row -->
+    </div>
+    <!-- /.container-fluid -->
+  </div>
+  <!-- /.content-header -->
+
+  <!-- Main content -->
+  <section class="content">
+    <div class="container-fluid">
+      <!-- Small boxes (Stat box) -->
+      <div class="row">
+        <div class="col-lg-3 col-6">
+          <!-- small box -->
+          <div class="small-box bg-info">
+            <div class="inner">
+              <h3>150</h3>
+
+              <p>New Orders</p>
+            </div>
+            <div class="icon">
+              <i class="ion ion-bag"></i>
+            </div>
+            <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+          </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-3 col-6">
+          <!-- small box -->
+          <div class="small-box bg-success">
+            <div class="inner">
+              <h3>53<sup style="font-size: 20px">%</sup></h3>
+
+              <p>Bounce Rate</p>
+            </div>
+            <div class="icon">
+              <i class="ion ion-stats-bars"></i>
+            </div>
+            <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+          </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-3 col-6">
+          <!-- small box -->
+          <div class="small-box bg-warning">
+            <div class="inner">
+              <h3>44</h3>
+
+              <p>User Registrations</p>
+            </div>
+            <div class="icon">
+              <i class="ion ion-person-add"></i>
+            </div>
+            <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+          </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-3 col-6">
+          <!-- small box -->
+          <div class="small-box bg-danger">
+            <div class="inner">
+              <h3>65</h3>
+
+              <p>Unique Visitors</p>
+            </div>
+            <div class="icon">
+              <i class="ion ion-pie-graph"></i>
+            </div>
+            <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+          </div>
+        </div>
+        <!-- ./col -->
+      </div>
+      <!-- /.row -->
+
+      <div class="container justify-content-center">
+        <div class="row justify-content-center">
+          <div class="col-md-3 col-sm-6 col-12">
+            <a href="{% url 'product:list' %}" class="text-dark">
+              <div class="info-box text-center item-align-center">
+                <span class="info-box-icon bg-info"><i class="fas fa-box"></i></span>
+
+                <div class="info-box-content">
+                  <span class="info-box-text">Produtos</span>
+                  <span class="info-box-number">12</span>
+                </div>
+                <!-- /.info-box-content -->
+              </div>
+            </a>
+            <!-- /.info-box -->
+          </div>
+          <!-- /.col -->
+
+          <div class="col-md-3 col-sm-6 col-12">
+            <a href="{% url 'product:category_list' %}" class="text-dark">
+              <div class="info-box text-center item-align-center">
+                <span class="info-box-icon bg-success"><i class="fas fa-tags"></i></span>
+
+                <div class="info-box-content">
+                  <span class="info-box-text">Categorias</span>
+                  <span class="info-box-number">12</span>
+                </div>
+                <!-- /.info-box-content -->
+              </div>
+            </a>
+            <!-- /.info-box -->
+          </div>
+          <!-- /.col -->
+
+          <div class="col-md-3 col-sm-6 col-12">
+            <a href="{% url 'product:brand_list' %}" class="text-dark">
+              <div class="info-box text-center item-align-center">
+                <span class="info-box-icon bg-secondary"><i class="fas fa-copyright"></i></span>
+
+                <div class="info-box-content">
+                  <span class="info-box-text">Marcas</span>
+                  <span class="info-box-number">12</span>
+                </div>
+                <!-- /.info-box-content -->
+              </div>
+            </a>
+            <!-- /.info-box -->
+          </div>
+          <!-- /.col -->
+
+          <div class="col-md-3 col-sm-6 col-12">
+            <a href="{% url 'product:ncm_list' %}" class="text-dark">
+              <div class="info-box text-center item-align-center">
+                <span class="info-box-icon bg-purple"><i class="fas fa-list"></i></span>
+
+                <div class="info-box-content">
+                  <span class="info-box-text">NCM</span>
+                  <span class="info-box-number">12</span>
+                </div>
+                <!-- /.info-box-content -->
+              </div>
+            </a>
+            <!-- /.info-box -->
+          </div>
+          <!-- /.col -->
+
+          <div class="col-md-3 col-sm-6 col-12">
+            <a href="{% url 'product:cfop_list' %}" class="text-dark">
+              <div class="info-box text-center item-align-center">
+                <span class="info-box-icon bg-teal"><i class="fas fa-code"></i></span>
+
+                <div class="info-box-content">
+                  <span class="info-box-text">CFOP</span>
+                  <span class="info-box-number">12</span>
+                </div>
+                <!-- /.info-box-content -->
+              </div>
+            </a>
+            <!-- /.info-box -->
+          </div>
+          <!-- /.col -->
+
+          <div class="col-md-3 col-sm-6 col-12">
+            <a href="{% url 'product:taxbenefit_list' %}" class="text-dark">
+              <div class="info-box text-center item-align-center">
+                <span class="info-box-icon bg-indigo"><i class="fas fa-percentage"></i></span>
+
+                <div class="info-box-content">
+                  <span class="info-box-text">Benefícios Fiscais</span>
+                  <span class="info-box-number">12</span>
+                </div>
+                <!-- /.info-box-content -->
+              </div>
+            </a>
+            <!-- /.info-box -->
+          </div>
+          <!-- /.col -->
+
+          <div class="col-md-3 col-sm-6 col-12">
+            <a href="{% url 'product:exemptionreason_list' %}" class="text-dark">
+              <div class="info-box text-center item-align-center">
+                <span class="info-box-icon bg-orange"><i class="fas fa-exclamation-circle"></i></span>
+
+                <div class="info-box-content">
+                  <span class="info-box-text">Motivos Desoneração</span>
+                  <span class="info-box-number">12</span>
+                </div>
+                <!-- /.info-box-content -->
+              </div>
+            </a>
+            <!-- /.info-box -->
+          </div>
+          <!-- /.col -->
+        </div>
+      </div>
+
+
+      <div class="container justify-content-center">
+        <div class="card justify-content-center">
+          <div class="card-header">
+            <h3 class="card-title text-center">Pedidos</h3>
+          </div>
+          <!-- /.card-header -->
+          <div class="card-body p-0">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th style="width: 10px">Nº</th>
+                  <th>Cliente</th>
+                  <th>Progresso</th>
+                  <th style="width: 40px">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for order in orders %}
+                  <tr>
+                    <td>{{ order.id }}</td>
+                    <td>{% if order.customer %}{{ order.customer.username }}{% else %}Cliente Anônimo{% endif %}</td>
+                    <td>
+                      <div class="progress progress-xs">
+                      {% if  order.status == 'E' %} <!--Status E = Pending(Espera)-->
+                        <div class="progress-bar bg-warning" style="width: 25%"></div>
+
+                      {% elif order.status == 'P' %} <!--Status P = Preparing(Preparando)-->
+                        <div class="progress-bar bg-primary" style="width: 50%"></div>
+
+                      {% elif order.status == 'S' %} <!--Status S = Shipped(Enviado)-->
+                        <div class="progress-bar bg-info" style="width: 75%"></div>
+
+                      {% else %} <!--Status C = Completed(Concluido)-->
+                        <div class="progress-bar bg-success" style="width: 100%"></div>
+                      {% endif %}
+
+                      </div>
+                    </td>
+                    <td>
+                      {% if  order.status == 'E' %} <!--Status E = Pending(Espera)-->
+                        <span class="badge bg-warning">Pendente</span>
+
+                      {% elif order.status == 'P' %} <!--Status P = Preparing(Preparando)-->
+                      <span class="badge bg-primary">Preparo</span>
+
+                      {% elif order.status == 'S' %} <!--Status S = Shipped(Enviado)-->
+                      <span class="badge bg-info">Enviado</span>
+
+                      {% else %} <!--Status C = Completed(Concluido)-->
+                      <span class="badge bg-success">Concluido</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          <!-- /.card-body -->
+        </div>
+
+      </div>
+
+      <!-- Main row -->
+      <div class="row">
+        <!-- Left col -->
+        <section class="col-lg-7 connectedSortable"></section>
+        <!-- /.Left col -->
+        <!-- right col (We are only adding the ID to make the widgets sortable) -->
+        <section class="col-lg-5 connectedSortable"></section>
+        <!-- right col -->
+      </div>
+      <!-- /.row (main row) -->
+    </div>
+    <!-- /.container-fluid -->
+  </section>
+{% endblock %}

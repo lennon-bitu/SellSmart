@@ -5,6 +5,14 @@ from django.contrib import messages
 
 
 # Create your views here.
+def login_page(request):
+
+    if request.user.is_authenticated:
+        return redirect('paniel/dashboard/')
+
+    return redirect('accounts/login/')
+
+
 def register(request):
     form = CustomUserCreationForm()
     if request.method == "POST":

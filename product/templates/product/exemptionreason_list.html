@@ -1,0 +1,106 @@
+{% extends 'base/base.html' %}
+
+{% block title %}
+  Lista de Motivos de Desoneração
+{% endblock %}
+
+{% block content %}
+  <div class="container-fluid">
+    {% include "partials/message.html" %}
+    <div class="card">
+      <div class="card-header">
+        <div class="col-sm-12 col-md-6 card-title">
+          <div class="dt-buttons btn-group flex-wrap">
+            <div class="col-sm-12 col-md-3">
+              <a href="{% url 'product:exemptionreason_create' %}" class="btn btn-info">Adicionar</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-tools">
+          <div class="input-group input-group-sm" style="width: 150px;">
+            <input type="text" name="table_search" class="form-control float-right" placeholder="Search" />
+
+            <div class="input-group-append">
+              <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body table-responsive p-0" style="height: 80dvh;">
+      <table id="example2" class="table table-head-fixed text-nowrap table-bordered table-hover dataTable dtr-inline" aria-describedby="example2_info">
+        <thead>
+          <tr>
+            <th class="sorting sorting_asc" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Código: activate to sort column descending">Código</th>
+            <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Nome: activate to sort column ascending">Nome</th>
+            <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Tipo: activate to sort column ascending">Tipo</th>
+            <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Ativo: activate to sort column ascending">Ativo</th>
+            <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Ações: activate to sort column ascending">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for exemptionreason in page_obj %}
+            <tr class="odd">
+              <td class="dtr-control sorting_1" tabindex="0">{{ exemptionreason.code }}</td>
+              <td class="dtr-control sorting_1" tabindex="0">{{ exemptionreason.name }}</td>
+              <td>{{ exemptionreason.type }}</td>
+              <td>
+                {% if exemptionreason.is_active %}
+                  <span class="badge badge-success">Sim</span>
+                {% else %}
+                  <span class="badge badge-danger">Não</span>
+                {% endif %}
+              </td>
+              <td>
+                <div class="dt-buttons btn-group flex-wrap">
+                  <a class="btn btn-warning buttons-csv buttons-html5" tabindex="0" aria-controls="example1" type="button" title="Editar" href="{% url "product:exemptionreason_update" exemptionreason.id %}"><span><i class="fas fa-pen"></i></span></a>
+                  <a class="btn btn-danger buttons-excel buttons-html5" tabindex="0" aria-controls="example1" type="button" title="Excluir" href="{% url "product:exemptionreason_delete" exemptionreason.id %}"><span><i class="fas fa-trash"></i></span></a>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <th rowspan="1" colspan="1">Código</th>
+            <th rowspan="1" colspan="1">Nome</th>
+            <th rowspan="1" colspan="1">Tipo</th>
+            <th rowspan="1" colspan="1">Ativo</th>
+            <th rowspan="1" colspan="1">Ações</th>
+          </tr>
+        </tfoot>
+      </table>
+      <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center">
+          <li class="page-item">
+            {% if page_obj.has_previous %}
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                  <span aria-hidden="true">&laquo;</span>
+                  <span class="sr-only">Previous</span>
+                </a>
+            {% endif %}
+          </li>
+          <!-- Exibir números de páginas -->
+          {% for num in page_obj.paginator.page_range %}
+          {% if page_obj.number == num %}
+            <!-- Página atual -->
+              <li class="page-item current"><a class="page-link" href="#">{{ num }}</a></li>
+          {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+              <!-- Páginas próximas -->
+              <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+          {% endif %}
+      {% endfor %}
+          <li class="page-item">
+            {% if page_obj.has_next %}
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                  <span aria-hidden="true">&raquo;</span>
+                  <span class="sr-only">Next</span>
+                </a>
+            {% endif %}
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+{% endblock %}

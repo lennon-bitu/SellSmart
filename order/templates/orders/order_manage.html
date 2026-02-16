@@ -1,0 +1,176 @@
+{% extends 'base/base.html' %}
+
+{% block title %}
+  Gerenciar Pedidos
+{% endblock %}
+
+{% block content %}
+  <div class="container-fluid">
+    {% include "partials/message.html" %}
+    <div class="card">
+      <div class="card-header">
+        <div class="col-sm-12 col-md-6 card-title">
+          <div class="dt-buttons btn-group flex-wrap">
+            <div class="col-sm-12 col-md-3">
+              <a href="{% url 'orders:order_create' %}" class="btn btn-info">Adicionar</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-tools">
+          <div class="input-group input-group-sm" style="width: 150px;">
+            <input type="text" name="table_search" class="form-control float-right" placeholder="Search" />
+
+            <div class="input-group-append">
+              <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body table-responsive p-0" style="height: 80dvh;">
+      <table id="example2" class="table table-head-fixed text-nowrap table-bordered table-hover dataTable dtr-inline" aria-describedby="example2_info">
+        <thead>
+          <tr>
+            <th class="sorting sorting_asc" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-sort="ascending" aria-label="ID: activate to sort column descending">ID</th>
+            <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Cliente: activate to sort column ascending">Cliente</th>
+            <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Data: activate to sort column ascending">Data</th>
+            <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Total: activate to sort column ascending">Total</th>
+            <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Status: activate to sort column ascending">Status</th>
+            <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Ações: activate to sort column ascending">Ações</th>
+          </tr>
+        </thead>
+        <tbody id="orders-table-body">
+          {% for order in orders %}
+            <tr class="odd" id="order-{{ order.id }}">
+              <td class="dtr-control sorting_1" tabindex="0">{{ order.id }}</td>
+              <td class="dtr-control sorting_1" tabindex="0">{{ order.customer.username }}</td>
+              <td>{{ order.created_at|date:"d/m/Y H:i" }}</td>
+              <td>R$ {{ order.total_price }}</td>
+              <td>
+                <span class="
+                  {% if order.status == 'E' %}badge badge-warning
+                  {% elif order.status == 'P' %}badge badge-primary
+                  {% elif order.status == 'S' %}badge badge-info
+                  {% else %}badge badge-success{% endif %}">
+                  {% if order.status == 'E' %}Pendente
+                  {% elif order.status == 'P' %}Preparando
+                  {% elif order.status == 'S' %}Enviado
+                  {% else %}Completo{% endif %}
+                </span>
+              </td>
+              <td>
+                <div class="dt-buttons btn-group flex-wrap">
+                  <a class="btn btn-secondary buttons-copy buttons-html5" tabindex="0" aria-controls="example1" type="button" title="Visualizar" href="{% url "orders:order_detail" order.id %}"><span><i class="fas fa-eye"></i></span></a>
+                  <a class="btn btn-warning buttons-csv buttons-html5" tabindex="0" aria-controls="example1" type="button" title="Editar Status" href="{% url "orders:order_update_status" order.id %}"><span><i class="fas fa-pen"></i></span></a>
+                  <a class="btn btn-danger buttons-excel buttons-html5" tabindex="0" aria-controls="example1" type="button" title="Excluir" href="#"><span><i class="fas fa-trash"></i></span></a>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <th rowspan="1" colspan="1">ID</th>
+            <th rowspan="1" colspan="1">Cliente</th>
+            <th rowspan="1" colspan="1">Data</th>
+            <th rowspan="1" colspan="1">Total</th>
+            <th rowspan="1" colspan="1">Status</th>
+            <th rowspan="1" colspan="1">Ações</th>
+          </tr>
+        </tfoot>
+      </table>
+      <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center">
+          <li class="page-item">
+            <a class="page-link" href="#" aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+          <li class="page-item"><a class="page-link" href="#">1</a></li>
+          <li class="page-item"><a class="page-link" href="#">2</a></li>
+          <li class="page-item"><a class="page-link" href="#">3</a></li>
+          <li class="page-item">
+            <a class="page-link" href="#" aria-label="Next">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Script para notificação sonora de novos pedidos -->
+  <audio id="notificationSound" preload="auto">
+    <source src="https://assets.mixkit.co/sfx/preview/mixkit-door-bell-single-press-333.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+    // Função para tocar som de notificação
+    function playNotificationSound() {
+      const audio = document.getElementById('notificationSound');
+      if (audio) {
+        audio.currentTime = 0;
+        audio.play().catch(e => console.log("Erro ao reproduzir áudio: ", e));
+      }
+    }
+
+    // Variável para armazenar o número de pedidos inicial
+    // Armazenar IDs dos pedidos atuais
+    let currentOrderIds = new Set();
+    document.querySelectorAll('#orders-table-body tr[id^="order-"]').forEach(row => {
+      const orderId = row.id.replace('order-', '');
+      if (orderId) {
+        currentOrderIds.add(orderId);
+      }
+    });
+
+    // Função para verificar novos pedidos
+    function checkNewOrders() {
+      fetch(window.location.href)
+        .then(response => response.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, 'text/html');
+          const newOrderRows = doc.querySelectorAll('#orders-table-body tr[id^="order-"]');
+          
+          // Extrair IDs dos novos pedidos
+          const newOrderIds = new Set();
+          newOrderRows.forEach(row => {
+            const orderId = row.id.replace('order-', '');
+            if (orderId) {
+              newOrderIds.add(orderId);
+            }
+          });
+
+          // Verificar se há novos pedidos
+          let hasNewOrders = false;
+          for (const newOrderId of newOrderIds) {
+            if (!currentOrderIds.has(newOrderId)) {
+              hasNewOrders = true;
+              break;
+            }
+          }
+
+          // Se houver novos pedidos, toca o som e atualiza a lista
+          if (hasNewOrders) {
+            playNotificationSound();
+            document.getElementById('orders-table-body').innerHTML = doc.getElementById('orders-table-body').innerHTML;
+            
+            // Atualizar o conjunto de IDs atuais
+            currentOrderIds = new Set();
+            document.querySelectorAll('#orders-table-body tr[id^="order-"]').forEach(row => {
+              const orderId = row.id.replace('order-', '');
+              if (orderId) {
+                currentOrderIds.add(orderId);
+              }
+            });
+          }
+        })
+        .catch(error => console.error('Erro ao verificar novos pedidos:', error));
+    }
+
+    // Verifica novos pedidos a cada 10 segundos
+    setInterval(checkNewOrders, 10000);
+  </script>
+{% endblock %}

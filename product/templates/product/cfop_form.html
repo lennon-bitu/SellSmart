@@ -1,0 +1,35 @@
+{% extends 'base/base.html' %}
+
+{% block title %}
+  {% if form.instance.pk %}Editar CFOP{% else %}Criar CFOP{% endif %}
+{% endblock %}
+
+{% block content %}
+<h3 class="text-center">{% if form.instance.pk %}Editar CFOP{% else %}Criar CFOP{% endif %}</h3>
+<div class="container">
+    <form method="POST" class="text-secondary">
+        {% csrf_token %}
+        <div class="row">
+          {% for field in form %}
+
+            <div class="form-group col-sm-12 col-xl-6 col-md-6 col-xl-6">
+              <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {{ field }}
+
+              {% if field.help_text %}
+                <p class="text-secondary">{{ field.help_text }}</p>
+              {% endif %}
+              <div class="text-danger">
+                {{ field.errors }}
+              </div>
+            </div>
+
+          {% endfor %}
+        </div>
+
+        <button class="btn btn-info mt-3" type="submit">Gravar</button>
+        <a class="btn btn-secondary mt-3" href="{% url 'product:cfop_list' %}">Cancelar</a>
+    </form>
+</div>
+
+{% endblock %}

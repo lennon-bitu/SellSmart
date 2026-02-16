@@ -20,18 +20,40 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-)9azew4xr-)^$jshj$@qf1&3swp3=_&k!=+8^)c6xc6%t800m('
+import os
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-)9azew4xr-)^$jshj$@qf1&3swp3=_&k!=+8^)c6xc6%t800m(')
 
 # SECURITY WARNING: don't run with debug turned on in production!
+#DEBUG = os.environ.get('DEBUG', 'True').lower() == 'True'
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+
+# Security settings for production
+if not DEBUG:
+    # HSTS settings
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    
+    # SSL settings
+    SECURE_SSL_REDIRECT = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    
+    # Session and CSRF settings
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    
+    # Clickjacking protection
+    X_FRAME_OPTIONS = 'DENY'
 
 
 # Application definition
 
 INSTALLED_APPS = [
     'accounts',
+    'pdv',
+    'financial_control',
     'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -40,7 +62,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'drf_yasg',
     'product',
+    'dashboard',
+    'order',
 ]
 
 MIDDLEWARE = [
@@ -52,6 +77,17 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ]
+}
+
 
 ROOT_URLCONF = 'core.urls'
 
@@ -121,11 +157,11 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-#STATICFILES_DIRS = [ BASE_DIR / "static",]
-#STATIC_ROOT = BASE_DIR / 'static'
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
+
+# STATIC_ROOT = BASE_DIR / 'staticfiles'  # Comentado para desenvolvimento
 
 
 MEDIA_URL = 'media/'
@@ -140,7 +176,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 
 LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = '/paniel/dashboard'
+LOGIN_REDIRECT_URL = '/paniel/dashboard/'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 
 

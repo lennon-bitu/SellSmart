@@ -1,0 +1,106 @@
+{% extends 'base/base.html' %}
+
+{% block title %}
+  {{ action }}
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">{{ action }}</h3>
+        </div>
+        <div class="card-body">
+          <form method="post">
+            {% csrf_token %}
+            <div class="row">
+              <div class="col-md-6">
+                {% if form.customer %}
+                <div class="form-group">
+                  <label for="{{ form.customer.id_for_label }}">Cliente:</label>
+                  {{ form.customer }}
+                  <div class="text-danger">
+                    {{ form.customer.errors }}
+                  </div>
+                </div>
+                {% endif %}
+                
+                {% if form.supplier %}
+                <div class="form-group">
+                  <label for="{{ form.supplier.id_for_label }}">Fornecedor:</label>
+                  {{ form.supplier }}
+                  <div class="text-danger">
+                    {{ form.supplier.errors }}
+                  </div>
+                </div>
+                {% endif %}
+
+                <div class="form-group">
+                  <label for="{{ form.amount.id_for_label }}">Valor:</label>
+                  {{ form.amount }}
+                  <div class="text-danger">
+                    {{ form.amount.errors }}
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="{{ form.due_date.id_for_label }}">Data de Vencimento:</label>
+                  {{ form.due_date }}
+                  <div class="text-danger">
+                    {{ form.due_date.errors }}
+                  </div>
+                </div>
+                
+                {% if form.cash_book %}
+                <div class="form-group">
+                  <label for="{{ form.cash_book.id_for_label }}">Livro Caixa:</label>
+                  {{ form.cash_book }}
+                  <div class="text-danger">
+                    {{ form.cash_book.errors }}
+                  </div>
+                </div>
+                {% endif %}
+              </div>
+
+              <div class="col-md-6">
+                {% if form.sale %}
+                <div class="form-group">
+                  <label for="{{ form.sale.id_for_label }}">Venda (Opcional):</label>
+                  {{ form.sale }}
+                  <div class="text-danger">
+                    {{ form.sale.errors }}
+                  </div>
+                </div>
+                {% endif %}
+
+                {% if form.order %}
+                <div class="form-group">
+                  <label for="{{ form.order.id_for_label }}">Pedido (Opcional):</label>
+                  {{ form.order }}
+                  <div class="text-danger">
+                    {{ form.order.errors }}
+                  </div>
+                </div>
+                {% endif %}
+
+                <div class="form-group">
+                  <label for="{{ form.description.id_for_label }}">Descrição:</label>
+                  {{ form.description }}
+                  <div class="text-danger">
+                    {{ form.description.errors }}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-success">Salvar</button>
+            <a href="{% if 'Receber' in action %}{% url 'financial_control:account_receivable_list' %}{% else %}{% url 'financial_control:account_payable_list' %}{% endif %}" class="btn btn-secondary">Cancelar</a>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

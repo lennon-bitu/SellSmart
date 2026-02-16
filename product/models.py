@@ -91,6 +91,7 @@ class Category(models.Model):
     name = models.CharField(max_length=255, verbose_name='Nome')  # Nome do motivo de desoneração
     description = models.TextField(blank=True, null=True, verbose_name='Descrição')  # Descrição do motivo de desoneração
     is_active = models.BooleanField(default=True, verbose_name='Ativo')
+    #image = models.ImageField("Image", upload_to="images/categoria", blank=True, default="")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Criado em')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Atualizado em')
     
@@ -139,7 +140,7 @@ class Product(models.Model):
     image = models.ImageField("Image", upload_to="images/produto", blank=True, default="")
 
     class Meta:
-        ordering = ['code']
+        ordering = ['-code']
         verbose_name = 'Produto'
         verbose_name_plural = 'Produto'
 

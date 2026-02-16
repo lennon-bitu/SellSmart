@@ -1,0 +1,252 @@
+{% extends 'base/base.html' %}
+
+{% block title %}
+  Controle Financeiro
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Controle Financeiro</h3>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <!-- Caixas abertos -->
+            <div class="col-md-3">
+              <div class="info-box">
+                <span class="info-box-icon bg-info"><i class="fas fa-cash-register"></i></span>
+                <div class="info-box-content">
+                  <span class="info-box-text">Caixas Abertos</span>
+                  <span class="info-box-number">{{ cash_registers.count }}</span>
+                  <a href="{% url 'financial_control:open_cash_register' %}" class="btn btn-sm btn-primary">Abrir Caixa</a>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Úimas transações -->
+            <div class="col-md-3">
+              <div class="info-box">
+                <span class="info-box-icon bg-success"><i class="fas fa-exchange-alt"></i></span>
+                <div class="info-box-content">
+                  <span class="info-box-text">Últimas Transações</span>
+                  <span class="info-box-number">{{ transactions.count }}</span>
+                  <a href="#" class="btn btn-sm btn-success">Ver Todas</a>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Contas a receber -->
+            <div class="col-md-3">
+              <div class="info-box">
+                <span class="info-box-icon bg-warning"><i class="fas fa-money-bill-wave"></i></span>
+                <div class="info-box-content">
+                  <span class="info-box-text">Contas a Receber</span>
+                  <span class="info-box-number">{{ receivables.count }}</span>
+                  <a href="{% url 'financial_control:create_account_receivable' %}" class="btn btn-sm btn-warning">Nova Conta</a>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Contas a pagar -->
+            <div class="col-md-3">
+              <div class="info-box">
+                <span class="info-box-icon bg-danger"><i class="fas fa-money-bill-alt"></i></span>
+                <div class="info-box-content">
+                  <span class="info-box-text">Contas a Pagar</span>
+                  <span class="info-box-number">{{ payables.count }}</span>
+                  <a href="{% url 'financial_control:create_account_payable' %}" class="btn btn-sm btn-danger">Nova Conta</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Úimas transações -->
+          <div class="row mt-4">
+            <div class="col-md-12">
+              <h4>Últimas Transações</h4>
+              <div class="table-responsive">
+                <table class="table table-bordered">
+                  <thead>
+                    <tr>
+                      <th>Tipo</th>
+                      <th>Método</th>
+                      <th>Valor</th>
+                      <th>Descrição</th>
+                      <th>Data</th>
+                      <th>Caixa</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for transaction in transactions %}
+                    <tr>
+                      <td>{{ transaction.get_transaction_type_display }}</td>
+                      <td>{{ transaction.get_payment_method_display }}</td>
+                      <td>R$ {{ transaction.amount }}</td>
+                      <td>{{ transaction.description }}</td>
+                      <td>{{ transaction.date|date:"d/m/Y H:i" }}</td>
+                      <td>{{ transaction.cash_register }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                      <td colspan="6">Nenhuma transação encontrada</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Livros Caixa -->
+          <div class="row mt-4">
+            <div class="col-md-12">
+              <h4>Livros Caixa</h4>
+              <div class="table-responsive">
+                <table class="table table-bordered">
+                  <thead>
+                    <tr>
+                      <th>Nome</th>
+                      <th>Saldo</th>
+                      <th>Status</th>
+                      <th>Criado Em</th>
+                      <th>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for book in cash_books %}
+                    <tr>
+                      <td>{{ book.name }}</td>
+                      <td>R$ {{ book.balance }}</td>
+                      <td>
+                        {% if book.is_active %}
+                          <span class="badge badge-success">Ativo</span>
+                        {% else %}
+                          <span class="badge badge-danger">Inativo</span>
+                        {% endif %}
+                      </td>
+                      <td>{{ book.created_at|date:"d/m/Y" }}</td>
+                      <td>
+                        <a href="{% url 'financial_control:cash_book_detail' book.id %}" class="btn btn-sm btn-info">Detalhes</a>
+                        <a href="{% url 'financial_control:transfer' %}" class="btn btn-sm btn-primary">Transferência</a>
+                      </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                      <td colspan="5">Nenhum livro caixa encontrado</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Contas a receber -->
+          <div class="row mt-4">
+            <div class="col-md-6">
+              <h4>Contas a Receber</h4>
+              <div class="table-responsive">
+                <table class="table table-bordered">
+                  <thead>
+                    <tr>
+                      <th>Cliente</th>
+                      <th>Valor</th>
+                      <th>Vencimento</th>
+                      <th>Status</th>
+                      <th>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for account in receivables %}
+                    <tr>
+                      <td>{{ account.customer.username }}</td>
+                      <td>R$ {{ account.amount }}</td>
+                      <td>{{ account.due_date|date:"d/m/Y" }}</td>
+                      <td>
+                        {% if account.is_paid %}
+                          <span class="badge badge-success">Pago</span>
+                        {% else %}
+                          <span class="badge badge-warning">Pendente</span>
+                        {% endif %}
+                      </td>
+                      <td>
+                        {% if not account.is_paid %}
+                          <a href="{% url 'financial_control:mark_as_paid_receivable_with_cash_book' account.id %}" class="btn btn-sm btn-success">Marcar como Pago</a>
+                        {% endif %}
+                        <a href="{% url 'financial_control:edit_account_receivable' account.id %}" class="btn btn-sm btn-warning">Editar</a>
+                        <a href="{% url 'financial_control:delete_account_receivable' account.id %}" class="btn btn-sm btn-danger">Excluir</a>
+                      </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                      <td colspan="5">Nenhuma conta a receber encontrada</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            
+            <!-- Contas a pagar -->
+            <div class="col-md-6">
+              <h4>Contas a Pagar</h4>
+              <div class="table-responsive">
+                <table class="table table-bordered">
+                  <thead>
+                    <tr>
+                      <th>Fornecedor</th>
+                      <th>Valor</th>
+                      <th>Vencimento</th>
+                      <th>Status</th>
+                      <th>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for account in payables %}
+                    <tr>
+                      <td>{{ account.supplier }}</td>
+                      <td>R$ {{ account.amount }}</td>
+                      <td>{{ account.due_date|date:"d/m/Y" }}</td>
+                      <td>
+                        {% if account.is_paid %}
+                          <span class="badge badge-success">Pago</span>
+                        {% else %}
+                          <span class="badge badge-warning">Pendente</span>
+                        {% endif %}
+                      </td>
+                      <td>
+                        {% if not account.is_paid %}
+                          <a href="{% url 'financial_control:mark_as_paid_payable_with_cash_book' account.id %}" class="btn btn-sm btn-success">Marcar como Pago</a>
+                        {% endif %}
+                        <a href="{% url 'financial_control:edit_account_payable' account.id %}" class="btn btn-sm btn-warning">Editar</a>
+                        <a href="{% url 'financial_control:delete_account_payable' account.id %}" class="btn btn-sm btn-danger">Excluir</a>
+                      </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                      <td colspan="5">Nenhuma conta a pagar encontrada</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Lançamentos Manuais -->
+          <div class="row mt-4">
+            <div class="col-md-12">
+              <h4>Lançamentos Manuais</h4>
+              <a href="{% url 'financial_control:manual_entry' %}" class="btn btn-success mr-2">Novo Lançamento</a>
+              <a href="{% url 'financial_control:manual_entry_list' %}" class="btn btn-info">Ver Todos</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

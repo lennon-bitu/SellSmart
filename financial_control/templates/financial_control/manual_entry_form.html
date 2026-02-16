@@ -1,0 +1,72 @@
+{% extends 'base/base.html' %}
+
+{% block title %}
+  {{ action }}
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">{{ action }}</h3>
+        </div>
+        <div class="card-body">
+          <form method="post">
+            {% csrf_token %}
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="{{ form.cash_book.id_for_label }}">Livro Caixa:</label>
+                  {{ form.cash_book }}
+                  <div class="text-danger">
+                    {{ form.cash_book.errors }}
+                  </div>
+                </div>
+                
+                <div class="form-group">
+                  <label for="{{ form.transaction_type.id_for_label }}">Tipo de Transação:</label>
+                  {{ form.transaction_type }}
+                  <div class="text-danger">
+                    {{ form.transaction_type.errors }}
+                  </div>
+                </div>
+                
+                <div class="form-group">
+                  <label for="{{ form.payment_method.id_for_label }}">Método de Pagamento:</label>
+                  {{ form.payment_method }}
+                  <div class="text-danger">
+                    {{ form.payment_method.errors }}
+                  </div>
+                </div>
+              </div>
+              
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="{{ form.amount.id_for_label }}">Valor:</label>
+                  {{ form.amount }}
+                  <div class="text-danger">
+                    {{ form.amount.errors }}
+                  </div>
+                </div>
+                
+                <div class="form-group">
+                  <label for="{{ form.description.id_for_label }}">Descrição:</label>
+                  {{ form.description }}
+                  <div class="text-danger">
+                    {{ form.description.errors }}
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <button type="submit" class="btn btn-success">Registrar Lançamento</button>
+            <a href="{% url 'financial_control:financial_control' %}" class="btn btn-secondary">Cancelar</a>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

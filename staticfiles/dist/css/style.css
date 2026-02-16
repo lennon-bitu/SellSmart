@@ -1,0 +1,46 @@
+
+
+body{
+    background-color: rgb(24, 24, 24);
+}
+
+
+.login{
+    height: 100dvh;
+    background-color: rgb(238, 238, 238);
+}
+
+
+.logo_login_page{
+    margin: 0 auto;
+}
+.img-logo-page{
+    margin-left: 20%;
+    width: 65%;
+    
+}
+
+.logo_login{
+    width: 30%;
+    margin-left: 35%;
+    margin-top: 20%;
+}
+
+.brand-logo{
+    width: 3rem;
+    height: 3rem;
+}
+
+
+.form-login{
+    margin: 0 auto;
+    width: 80%;
+}
+.form-login input{
+    border: 1px solid #015d92;
+    background-color: azure;
+}
+.form-login input:focus{
+    border: 1px solid #024972;
+    background-color: azure;
+}

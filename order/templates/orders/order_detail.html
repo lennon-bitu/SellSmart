@@ -1,0 +1,91 @@
+{% extends 'base/base.html' %}
+
+{% block title %}
+  Detalhes do Pedido #{{ order.id }}
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Detalhes do Pedido #{{ order.id }}</h3>
+      <div class="card-tools">
+        <a href="{% url 'orders:order_list' %}" class="btn btn-secondary">Voltar</a>
+        <a href="{% url 'orders:order_update_status' order.id %}" class="btn btn-warning">Alterar Status</a>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label>ID do Pedido:</label>
+            <p>{{ order.id }}</p>
+          </div>
+          <div class="form-group">
+            <label>Cliente:</label>
+            <p>{{ order.customer.username }}</p>
+          </div>
+          <div class="form-group">
+            <label>Data de Criação:</label>
+            <p>{{ order.created_at|date:"d/m/Y H:i" }}</p>
+          </div>
+          <div class="form-group">
+            <label>Status:</label>
+            <p>
+              <span class="
+                {% if order.status == 'E' %}badge badge-warning
+                {% elif order.status == 'P' %}badge badge-primary
+                {% elif order.status == 'S' %}badge badge-info
+                {% else %}badge badge-success{% endif %}">
+                {% if order.status == 'E' %}Pendente
+                {% elif order.status == 'P' %}Preparando
+                {% elif order.status == 'S' %}Enviado
+                {% else %}Completo{% endif %}
+              </span>
+            </p>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label>Total do Pedido:</label>
+            <p class="h4 text-bold">R$ {{ order.total_price }}</p>
+          </div>
+          
+          <!-- Informações adicionais -->
+          <div class="form-group">
+            <label>Itens do Pedido:</label>
+            <div class="table-responsive">
+              <table class="table table-bordered">
+                <thead>
+                  <tr>
+                    <th>Produto</th>
+                    <th>Quantidade</th>
+                    <th>Preço Unitário</th>
+                    <th>Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for item in order.items.all %}
+                  <tr>
+                    <td>{{ item.product.name }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>R$ {{ item.product.price }}</td>
+                    <td>R$ {{ item.get_subtotal|floatformat:2 }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <th colspan="3" class="text-right">Total:</th>
+                    <th>R$ {{ order.total_price }}</th>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

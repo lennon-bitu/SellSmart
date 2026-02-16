@@ -1,0 +1,99 @@
+{% extends 'base/base.html' %}
+
+{% block title %}
+  {% if order %}Alterar Status do Pedido #{{ order.id }}{% else %}Novo Pedido{% endif %}
+{% endblock %}
+
+{% block content %}
+<h3 class="text-center">{% if order %}Alterar Status do Pedido #{{ order.id }}{% else %}Novo Pedido{% endif %}</h3>
+<div class="container">
+    <form method="POST" class="text-secondary" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="row">
+          <div class="form-group col-sm-12 col-xl-6 col-md-6 col-xl-6">
+            <label for="id_status">Status:</label>
+            <select name="status" class="form-control" id="id_status">
+              <option value="E" {% if order.status == 'E' %}selected{% endif %}>Pendente</option>
+              <option value="P" {% if order.status == 'P' %}selected{% endif %}>Preparando</option>
+              <option value="S" {% if order.status == 'S' %}selected{% endif %}>Enviado</option>
+              <option value="C" {% if order.status == 'C' %}selected{% endif %}>Completo</option>
+            </select>
+          </div>
+
+          <div class="form-group col-sm-12 col-xl-6 col-md-6 col-xl-6">
+            <label for="id_payment_method">Método de Pagamento:</label>
+            <select name="payment_method" class="form-control" id="id_payment_method">
+              <option value="dinheiro" {% if order.payment_method == 'dinheiro' %}selected{% endif %}>Dinheiro</option>
+              <option value="cartao_credito" {% if order.payment_method == 'cartao_credito' %}selected{% endif %}>Cartão de Crédito</option>
+              <option value="cartao_debito" {% if order.payment_method == 'cartao_debito' %}selected{% endif %}>Cartão de Débito</option>
+              <option value="pix" {% if order.payment_method == 'pix' %}selected{% endif %}>PIX</option>
+              <option value="boleto" {% if order.payment_method == 'boleto' %}selected{% endif %}>Boleto</option>
+            </select>
+          </div>
+
+          <div class="form-group col-sm-12 col-xl-6 col-md-6 col-xl-6">
+            <label for="id_customer">Cliente:</label>
+            <input type="text" class="form-control" value="{{ order.customer.username }}" readonly>
+          </div>
+
+          <div class="form-group col-sm-12 col-xl-6 col-md-6 col-xl-6">
+            <label for="id_created_at">Data de Criação:</label>
+            <input type="text" class="form-control" value="{{ order.created_at|date:"d/m/Y H:i" }}" readonly>
+          </div>
+
+          <div class="form-group col-sm-12 col-xl-6 col-md-6 col-xl-6">
+            <label for="id_total_price">Total:</label>
+            <input type="text" class="form-control" value="R$ {{ order.total_price }}" readonly>
+          </div>
+        </div>
+
+        <button class="btn btn-info mt-3" type="submit">Atualizar Status</button>
+        <a class="btn btn-secondary mt-3" href="{% url 'orders:order_list' %}">Cancelar</a>
+    </form>
+    
+    <!-- Detalhes dos itens do pedido -->
+    <div class="mt-4">
+      <h4>Itens do Pedido</h4>
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Produto</th>
+            <th>Quantidade</th>
+            <th>Preço Unitário</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in order.items.all %}
+          <tr>
+            <td>{{ item.product.name }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>R$ {{ item.product.price }}</td>
+            <td>R$ {{ item.get_subtotal|floatformat:2 }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Função para multiplicar valores (precisa ser adicionada ao template base ou aqui)
+  Number.prototype.formatReal = function(c, d, t){
+    var n = this, 
+        c = isNaN(c = Math.abs(c)) ? 2 : c, 
+        d = d == undefined ? "," : d, 
+        t = t == undefined ? "." : t, 
+        s = n < 0 ? "-" : "",
+        i = String(parseInt(n = Math.abs(Number(n) || 0).toFixed(c))), 
+        j = (j = i.length) > 3 ? j % 3 : 0;
+       return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
+     };
+
+  // Adicionando filtro multiply para ser usado no template
+  // Este código é apenas para demonstração - em produção, você deve implementar isso corretamente
+</script>
+{% endblock %}

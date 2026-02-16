@@ -1,0 +1,136 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+  <h2>Create New Order</h2>
+  
+  <form method="POST">
+    {% csrf_token %}
+    
+    <!-- Order form -->
+    {{ order_form.as_p }}  <!-- total_price field is included here -->
+    
+    <h3>Order Items</h3>
+    <table id="order-items-table">
+        {{ order_item_formset.management_form }}
+        {% for form in order_item_formset %}
+        <tr class="order-item-form">
+            <td>
+                <select name="product">
+                    {% for product in products %}
+                        <option value="{{ product.id }}" data-price="{{ product.price }}">{{ product.name }}</option>
+                    {% endfor %}
+                </select>
+            </td>  <!-- Dropdown for selecting product -->
+            <td>{{ form.quantity }}</td>
+            <td class="item-price">0.00</td>  <!-- Displays price -->
+            <td>
+                {% if form.instance.pk %}
+                <button class="remove-item-btn" type="button">Remove</button>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    
+    <button type="button" id="add-item-btn">Add Item</button>
+    
+    <br>
+    <h3>Total Price: $<span id="display-total-price">0.00</span></h3>  <!-- Display real-time total -->
+    <input type="submit" value="Save Order">
+  </form>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      updateTotalPrice();  // Initialize total price
+
+      // Add item event
+      document.getElementById('add-item-btn').addEventListener('click', function() {
+        let formCount = document.querySelectorAll('.order-item-form').length;
+        let newForm = document.querySelector('.order-item-form').cloneNode(true);
+        let formRegex = new RegExp(`form-(\\d+)-`, 'g');
+        
+        newForm.innerHTML = newForm.innerHTML.replace(formRegex, `form-${formCount}-`);
+        document.getElementById('order-items-table').appendChild(newForm);
+
+        document.getElementById('id_form-TOTAL_FORMS').value = formCount + 1;
+
+        addProductPriceListener(newForm);  // Add listener to new item
+        updateTotalPrice();
+      });
+
+      // Event listener for removing items
+      document.addEventListener('click', function(e) {
+        if (e.target && e.target.classList.contains('remove-item-btn')) {
+          e.target.closest('tr').remove();
+          let formCount = document.querySelectorAll('.order-item-form').length;
+          document.getElementById('id_form-TOTAL_FORMS').value = formCount;
+          updateTotalPrice();
+        }
+      });
+
+      // Add listener for product and quantity changes
+      document.querySelectorAll('.order-item-form').forEach(function(row) {
+        addProductPriceListener(row);
+      });
+    });
+
+    function addProductPriceListener(row) {
+      let productField = row.querySelector('select[name$="product"]');
+      let quantityField = row.querySelector('input[name$="quantity"]');
+      let priceField = row.querySelector('.item-price');
+
+      if (productField) {
+        productField.addEventListener('change', function() {
+          updateItemPrice(row);
+          updateTotalPrice();
+        });
+      }
+
+      if (quantityField) {
+        quantityField.addEventListener('input', function() {
+          updateItemPrice(row);
+          updateTotalPrice();
+        });
+      }
+    }
+
+    function updateItemPrice(row) {
+      let productField = row.querySelector('select[name$="product"]');
+      let quantityField = row.querySelector('input[name$="quantity"]');
+      let priceField = row.querySelector('.item-price');
+
+      let productPrice = 0;
+      let selectedProduct = productField.options[productField.selectedIndex];
+
+      if (selectedProduct && selectedProduct.dataset.price) {
+        productPrice = parseFloat(selectedProduct.dataset.price);
+      }
+
+      let quantity = parseInt(quantityField.value) || 0;
+      let totalItemPrice = productPrice * quantity;
+
+      priceField.textContent = totalItemPrice.toFixed(2);  // Set item total price in the row
+    }
+
+    function updateTotalPrice() {
+      let total = 0;
+
+      // Sum all item prices
+      document.querySelectorAll('.order-item-form').forEach(function(row) {
+        let priceField = row.querySelector('.item-price');
+        let itemPrice = parseFloat(priceField.textContent) || 0;
+        total += itemPrice;
+      });
+
+      // Update the display total price
+      document.getElementById('display-total-price').textContent = total.toFixed(2);
+
+      // Update the hidden total_price field in the form
+      let totalPriceField = document.querySelector('input[name="total_price"]');
+      if (totalPriceField) {
+        totalPriceField.value = total.toFixed(2);  // Update form field
+      }
+    }
+  </script>
+  
+{% endblock %}

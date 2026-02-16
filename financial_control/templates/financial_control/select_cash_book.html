@@ -1,0 +1,39 @@
+{% extends 'base/base.html' %}
+
+{% block title %}
+  Selecionar Livro Caixa
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Selecionar Livro Caixa</h3>
+        </div>
+        <div class="card-body">
+          <p><strong>Conta:</strong> {{ account.description }}</p>
+          <p><strong>Valor:</strong> R$ {{ account.amount }}</p>
+          
+          <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+              <label for="cash_book">Selecione o Livro Caixa:</label>
+              <select name="cash_book" id="cash_book" class="form-control" required>
+                <option value="">Selecione um livro caixa</option>
+                {% for book in cash_books %}
+                <option value="{{ book.id }}">{{ book.name }} (R$ {{ book.balance }})</option>
+                {% endfor %}
+              </select>
+            </div>
+            
+            <button type="submit" class="btn btn-success">Confirmar Pagamento</button>
+            <a href="{% if type == 'receivable' %}{% url 'financial_control:account_receivable_list' %}{% else %}{% url 'financial_control:account_payable_list' %}{% endif %}" class="btn btn-secondary">Cancelar</a>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

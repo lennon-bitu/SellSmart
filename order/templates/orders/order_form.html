@@ -1,0 +1,175 @@
+{% extends 'base/base.html' %}
+
+{% block title %}
+  {% if order %}Editar Pedido{% else %}Criar Pedido{% endif %}
+{% endblock %}
+
+{% block content %}
+<h3 class="text-center">{% if order %}Editar Pedido #{{ order.id }}{% else %}Criar Pedido{% endif %}</h3>
+<div class="container">
+    <form method="POST" class="text-secondary" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <!-- Formulário do pedido -->
+        <div class="row">
+          <div class="form-group col-sm-12 col-xl-6 col-md-6 col-xl-6">
+            <label for="id_customer">Cliente:</label>
+            <select name="customer" class="form-control" id="id_customer">
+              {% for customer in customers %}
+                <option value="{{ customer.id }}" {% if order and order.customer.id == customer.id %}selected{% endif %}>
+                  {{ customer.username }} ({{ customer.email }})
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="form-group col-sm-12 col-xl-6 col-md-6 col-xl-6">
+            <label for="id_status">Status:</label>
+            <select name="status" class="form-control" id="id_status">
+              <option value="E" {% if order and order.status == 'E' %}selected{% endif %}>Pendente</option>
+              <option value="P" {% if order and order.status == 'P' %}selected{% endif %}>Preparando</option>
+              <option value="S" {% if order and order.status == 'S' %}selected{% endif %}>Enviado</option>
+              <option value="C" {% if order and order.status == 'C' %}selected{% endif %}>Completo</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Itens do pedido -->
+        <div class="row mt-4">
+          <div class="col-12">
+            <h4>Itens do Pedido</h4>
+            <table class="table table-bordered" id="order-items-table">
+              <thead>
+                <tr>
+                  <th>Produto</th>
+                  <th>Quantidade</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="order-item-row">
+                  <td>
+                    <select name="product" class="form-control">
+                      {% for product in products %}
+                        <option value="{{ product.id }}" data-price="{{ product.price }}">{{ product.name }} - R$ {{ product.price }}</option>
+                      {% endfor %}
+                    </select>
+                  </td>
+                  <td>
+                    <input type="number" name="quantity" class="form-control" min="1" value="1">
+                  </td>
+                  <td>
+                    <button type="button" class="btn btn-danger remove-item">Remover</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <button type="button" class="btn btn-info" id="add-item">Adicionar Item</button>
+          </div>
+        </div>
+
+        <div class="row mt-3">
+          <div class="form-group col-sm-12 col-xl-6 col-md-6 col-xl-6">
+            <label>Total do Pedido:</label>
+            <input type="text" class="form-control" id="total-price-display" value="R$ 0,00" readonly>
+            <input type="hidden" name="total_price" id="total-price-input" value="0.00">
+          </div>
+        </div>
+
+        <button class="btn btn-info mt-3" type="submit">Salvar Pedido</button>
+        <a class="btn btn-secondary mt-3" href="{% url 'orders:order_list' %}">Cancelar</a>
+    </form>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Função para calcular total
+    function calculateTotal() {
+      let total = 0;
+      document.querySelectorAll('.order-item-row').forEach(function(row) {
+        const productSelect = row.querySelector('select[name="product"]');
+        const quantityInput = row.querySelector('input[name="quantity"]');
+        
+        if (productSelect && quantityInput) {
+          const selectedOption = productSelect.options[productSelect.selectedIndex];
+          const price = parseFloat(selectedOption.getAttribute('data-price')) || 0;
+          const quantity = parseInt(quantityInput.value) || 0;
+          total += price * quantity;
+        }
+      });
+      
+      document.getElementById('total-price-display').value = 'R$ ' + total.toFixed(2).replace('.', ',');
+      document.getElementById('total-price-input').value = total.toFixed(2);
+    }
+
+    // Adicionar evento para quando mudar produto ou quantidade
+    function attachEvents() {
+      document.querySelectorAll('.order-item-row').forEach(function(row) {
+        const productSelect = row.querySelector('select[name="product"]');
+        const quantityInput = row.querySelector('input[name="quantity"]');
+        
+        if (productSelect) {
+          productSelect.addEventListener('change', calculateTotal);
+        }
+        if (quantityInput) {
+          quantityInput.addEventListener('input', calculateTotal);
+        }
+      });
+    }
+
+    // Adicionar item
+    document.getElementById('add-item').addEventListener('click', function() {
+      const tbody = document.querySelector('#order-items-table tbody');
+      const newRow = document.createElement('tr');
+      newRow.className = 'order-item-row';
+      newRow.innerHTML = `
+        <td>
+          <select name="product" class="form-control">
+            {% for product in products %}
+              <option value="{{ product.id }}" data-price="{{ product.price }}">{{ product.name }} - R$ {{ product.price }}</option>
+            {% endfor %}
+          </select>
+        </td>
+        <td>
+          <input type="number" name="quantity" class="form-control" min="1" value="1">
+        </td>
+        <td>
+          <button type="button" class="btn btn-danger remove-item">Remover</button>
+        </td>
+      `;
+      tbody.appendChild(newRow);
+      
+      // Adicionar eventos para o novo item
+      const productSelect = newRow.querySelector('select[name="product"]');
+      const quantityInput = newRow.querySelector('input[name="quantity"]');
+      
+      if (productSelect) {
+        productSelect.addEventListener('change', calculateTotal);
+      }
+      if (quantityInput) {
+        quantityInput.addEventListener('input', calculateTotal);
+      }
+      
+      calculateTotal();
+    });
+
+    // Remover item
+    document.addEventListener('click', function(e) {
+      if (e.target.classList.contains('remove-item')) {
+        const row = e.target.closest('.order-item-row');
+        if (document.querySelectorAll('.order-item-row').length > 1) {
+          row.remove();
+          calculateTotal();
+        } else {
+          alert('Você deve ter pelo menos um item no pedido.');
+        }
+      }
+    });
+
+    // Calcular total inicial
+    attachEvents();
+    calculateTotal();
+  });
+</script>
+
+{% endblock %}

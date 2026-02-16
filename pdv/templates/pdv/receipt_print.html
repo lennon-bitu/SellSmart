@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Recibo de Venda</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            margin: 0;
+            padding: 10px;
+            font-size: 14px;
+            width: 80mm; /* Largura padrão de papel de bobina */
+            background-color: white;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .company-name {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .company-details {
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+        .divider {
+            border-top: 1px dashed #000;
+            margin: 10px 0;
+        }
+        .info-section {
+            margin: 5px 0;
+        }
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+        }
+        .items {
+            margin: 10px 0;
+        }
+        .item {
+            display: flex;
+            justify-content: space-between;
+            margin: 2px 0;
+        }
+        .item-name {
+            flex: 1;
+            text-align: left;
+        }
+        .item-qty {
+            width: 40px;
+            text-align: right;
+        }
+        .item-price {
+            width: 70px;
+            text-align: right;
+        }
+        .item-total {
+            width: 70px;
+            text-align: right;
+        }
+        .totals {
+            margin: 10px 0;
+        }
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 12px;
+        }
+        .barcode {
+            text-align: center;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body onload="window.print()">
+    <div class="header">
+        <div class="company-name">SELL SMART</div>
+        <div class="company-details">CNPJ: 12.345.678/0001-90</div>
+        <div class="company-details">Rua Comercial, 123 - Centro</div>
+        <div class="company-details">Cidade - UF | CEP: 00000-000</div>
+    </div>
+    
+    <div class="divider"></div>
+    
+    <div class="info-section">
+        <div class="info-item">
+            <span>Data:</span>
+            <span>{{ sale.created_at|date:"d/m/Y H:i" }}</span>
+        </div>
+        <div class="info-item">
+            <span>Venda #:</span>
+            <span>{{ sale.id }}</span>
+        </div>
+        <div class="info-item">
+            <span>Cliente:</span>
+            <span>{{ sale.customer.username|default:"Consumidor Final" }}</span>
+        </div>
+        <div class="info-item">
+            <span>Pagamento:</span>
+            <span>{{ sale.get_payment_method_display }}</span>
+        </div>
+    </div>
+    
+    <div class="divider"></div>
+    
+    <div class="items">
+        {% for item in sale.items.all %}
+        <div class="item">
+            <div class="item-name">{{ item.product.name|truncatechars:15 }}</div>
+            <div class="item-qty">{{ item.quantity }}x</div>
+            <div class="item-price">R$ {{ item.unit_price|floatformat:2 }}</div>
+            <div class="item-total">R$ {{ item.total_price|floatformat:2 }}</div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="divider"></div>
+    
+    <div class="totals">
+        <div class="total-row">
+            <span>Subtotal:</span>
+            <span>R$ {{ sale.total_amount|floatformat:2 }}</span>
+        </div>
+        <div class="total-row">
+            <span>Desconto:</span>
+            <span>- R$ {{ sale.discount|floatformat:2 }}</span>
+        </div>
+        <div class="total-row">
+            <span>Total:</span>
+            <span>R$ {{ sale.final_amount|floatformat:2 }}</span>
+        </div>
+    </div>
+    
+    <div class="divider"></div>
+    
+    <div class="footer">
+        <div>Obrigado pela sua compra!</div>
+        <div>VOLTE SEMPRE!</div>
+        <div class="barcode">
+            <!-- Aqui poderia ser adicionado um código de barras -->
+            <div>{{ sale.id|zfill:8 }}</div>
+        </div>
+    </div>
+</body>
+</html>
