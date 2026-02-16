@@ -1,5 +1,9 @@
 # SellSmart
 
+## Preview do Sistema
+
+![Tela do sistema](https://drive.google.com/uc?export=view&id=1cPhuuJhN7Cc7oebPu4HABOvA-73Q5dvM)
+
 Sistema de gestão comercial desenvolvido com **Django 5.0**, focado em PDV (Ponto de Venda), controle financeiro e gestão de produtos.
 
 ## 📋 Funcionalidades
