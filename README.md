@@ -32,7 +32,7 @@ Sistema de gestão comercial desenvolvido com **Django 5.0**, focado em PDV (Pon
 
 1. **Clone o repositório**
    ```bash
-   git clone <url-do-repositorio>
+   git clone https://github.com/lennon-bitu/SellSmart.git
    cd SellSmartAI
    ```
 
